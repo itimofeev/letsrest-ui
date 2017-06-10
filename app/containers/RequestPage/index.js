@@ -10,7 +10,11 @@ import Helmet from 'react-helmet';
 import MenuItem from 'material-ui/MenuItem';
 // import { FormattedMessage } from 'react-intl';
 import { createStructuredSelector } from 'reselect';
-import makeSelectRequestPage, { makeSelectRequest } from './selectors';
+import makeSelectRequestPage, {
+  makeSelectRequest,
+  selectErrorExecRequest,
+  selectLoadingExecRequest,
+} from './selectors';
 // import messages from './messages';
 import RequestContainer from './RequestContainer';
 import Form from './Form';
@@ -25,6 +29,21 @@ export class RequestPage extends React.Component { // eslint-disable-line react/
   render() {
     const request = this.props.request;
     const data = request.get('data');
+    const loading = this.props.loadingExecRequest;
+
+    let submitButtonRender = (<SendButton
+      label="Send"
+      primary
+      onClick={this.props.onSubmitForm}
+    />);
+    if (loading) {
+      submitButtonRender = (<SendButton
+        label="Cancel"
+        primary
+        onClick={this.props.onSubmitForm}
+      />);
+    }
+
     return (
       <div>
         <Helmet
@@ -40,6 +59,7 @@ export class RequestPage extends React.Component { // eslint-disable-line react/
             <MethodField
               floatingLabelText="Method"
               value={data.get('method')}
+              disabled={loading}
               onChange={this.props.onChangeMethod}
             >
               <MenuItem value={'GET'} primaryText="GET" />
@@ -51,15 +71,12 @@ export class RequestPage extends React.Component { // eslint-disable-line react/
             <URLField
               hintText="URL"
               floatingLabelText="URL"
+              disabled={loading}
               onChange={this.props.onChangeUrl}
               value={data.get('url')}
             />
 
-            <SendButton
-              label="Send"
-              primary
-              onClick={this.props.onSubmitForm}
-            />
+            {submitButtonRender}
           </RequestContainer>
         </Form>
       </div>
@@ -72,11 +89,18 @@ RequestPage.propTypes = {
   onChangeUrl: PropTypes.func.isRequired,
   onSubmitForm: PropTypes.func.isRequired,
   request: PropTypes.object.isRequired,
+  errorExecRequest: React.PropTypes.oneOfType([
+    React.PropTypes.string,
+    React.PropTypes.bool,
+  ]),
+  loadingExecRequest: PropTypes.bool.isRequired,
 };
 
 const mapStateToProps = createStructuredSelector({
   RequestPage: makeSelectRequestPage(),
   request: makeSelectRequest(),
+  errorExecRequest: selectErrorExecRequest(),
+  loadingExecRequest: selectLoadingExecRequest(),
 });
 
 function mapDispatchToProps(dispatch) {
