@@ -21,23 +21,6 @@ import { sendExecRequest, requestMethodChange, requestUrlChange } from './action
 
 
 export class RequestPage extends React.Component { // eslint-disable-line react/prefer-stateless-function
-  constructor(props) {
-    super(props);
-
-    this.handleSubmit = this.handleSubmit.bind(this);
-
-    this.state = {
-      data: {
-        method: 'GET',
-        url: '',
-      },
-    };
-  }
-
-  handleSubmit = (evt) => {
-    if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-    this.props.sendExecRequest(this.state);
-  };
 
   render() {
     const request = this.props.request;
@@ -51,7 +34,8 @@ export class RequestPage extends React.Component { // eslint-disable-line react/
           ]}
         />
 
-        <Form onSubmit={this.handleSubmit}>
+        <Form onSubmit={this.props.onSubmitForm}>
+          ID: {request.get('id')}
           <RequestContainer>
             <MethodField
               floatingLabelText="Method"
@@ -74,7 +58,7 @@ export class RequestPage extends React.Component { // eslint-disable-line react/
             <SendButton
               label="Send"
               primary
-              onClick={this.handleSubmit}
+              onClick={this.props.onSubmitForm}
             />
           </RequestContainer>
         </Form>
@@ -84,9 +68,9 @@ export class RequestPage extends React.Component { // eslint-disable-line react/
 }
 
 RequestPage.propTypes = {
-  sendExecRequest: PropTypes.func.isRequired,
   onChangeMethod: PropTypes.func.isRequired,
   onChangeUrl: PropTypes.func.isRequired,
+  onSubmitForm: PropTypes.func.isRequired,
   request: PropTypes.object.isRequired,
 };
 
@@ -99,7 +83,10 @@ function mapDispatchToProps(dispatch) {
   return {
     onChangeMethod: (event, index, method) => dispatch(requestMethodChange(method)),
     onChangeUrl: (evt) => dispatch(requestUrlChange(evt.target.value)),
-    sendExecRequest,
+    onSubmitForm: (evt) => {
+      if (evt !== undefined && evt.preventDefault) evt.preventDefault();
+      dispatch(sendExecRequest());
+    },
   };
 }
 

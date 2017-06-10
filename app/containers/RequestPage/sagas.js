@@ -1,5 +1,6 @@
 // import { take, call, put, select } from 'redux-saga/effects';
 
+import { fromJS } from 'immutable';
 import { LOCATION_CHANGE } from 'react-router-redux';
 import { cancel, put, take, takeLatest } from 'redux-saga/effects';
 // import request from 'utils/request';
@@ -25,15 +26,15 @@ import { SEND_EXEC_REQUEST, sendExecRequestSuccess } from './actions';
 //   }
 // }
 
-export function* sendExecRequest(action) {
-  yield put(sendExecRequestSuccess({
+export function* sendExecRequest() {
+  yield put(sendExecRequestSuccess(fromJS({
     id: '22222',
     name: 'hello, there',
     data: {
       method: 'DELETE',
       url: 'http://ya.ru',
     },
-  }));
+  })));
 }
 
 

@@ -16,6 +16,8 @@ import {
 // The initial state of the App
 const initialState = fromJS({
   request: {
+    id: '',
+    name: '',
     data: {
       method: 'GET',
       url: '',

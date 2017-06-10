@@ -12,10 +12,9 @@ export const REQUEST_METHOD_CHANGE = 'app/RequestPage/REQUEST_METHOD_CHANGE';
 export const REQUEST_URL_CHANGE = 'app/RequestPage/REQUEST_URL_CHANGE';
 
 
-export function sendExecRequest(request) {
+export function sendExecRequest() {
   return {
     type: SEND_EXEC_REQUEST,
-    request,
   };
 }
 
