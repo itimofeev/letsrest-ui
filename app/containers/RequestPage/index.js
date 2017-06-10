@@ -8,12 +8,15 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import MenuItem from 'material-ui/MenuItem';
+import AppBar from 'material-ui/AppBar';
+import Drawer from 'material-ui/Drawer';
 // import { FormattedMessage } from 'react-intl';
 import { createStructuredSelector } from 'reselect';
 import makeSelectRequestPage, {
   makeSelectRequest,
   selectErrorExecRequest,
   selectLoadingExecRequest,
+  selectRequestList,
 } from './selectors';
 // import messages from './messages';
 import RequestContainer from './RequestContainer';
@@ -21,10 +24,14 @@ import Form from './Form';
 import MethodField from './MethodField';
 import URLField from './URLField';
 import SendButton from './SendButton';
-import { sendExecRequest, requestMethodChange, requestUrlChange } from './actions';
+import { sendExecRequest, requestMethodChange, requestUrlChange, sendRequestList } from './actions';
 
 
 export class RequestPage extends React.Component { // eslint-disable-line react/prefer-stateless-function
+
+  componentDidMount() {
+    this.props.sendRequestList();
+  }
 
   render() {
     const request = this.props.request;
@@ -34,7 +41,7 @@ export class RequestPage extends React.Component { // eslint-disable-line react/
     let submitButtonRender = (<SendButton
       label="Send"
       primary
-      onClick={this.props.onSubmitForm}
+      onClick={this.props.sendRequestList}
     />);
     if (loading) {
       submitButtonRender = (<SendButton
@@ -46,6 +53,20 @@ export class RequestPage extends React.Component { // eslint-disable-line react/
 
     return (
       <div>
+        <AppBar
+          title="Title"
+          iconClassNameRight="muidocs-icon-navigation-expand-more"
+        />
+        <Drawer open>
+          <AppBar
+            title="Title"
+            iconClassNameRight="muidocs-icon-navigation-expand-more"
+          />
+
+          {this.props.requestList.map((h, i) =>
+            <MenuItem key={i}>{h.get('name')}</MenuItem>,
+          )}
+        </Drawer>
         <Helmet
           title="RequestPage"
           meta={[
@@ -88,7 +109,9 @@ RequestPage.propTypes = {
   onChangeMethod: PropTypes.func.isRequired,
   onChangeUrl: PropTypes.func.isRequired,
   onSubmitForm: PropTypes.func.isRequired,
+  sendRequestList: PropTypes.func.isRequired,
   request: PropTypes.object.isRequired,
+  requestList: PropTypes.object.isRequired,
   errorExecRequest: React.PropTypes.oneOfType([
     React.PropTypes.string,
     React.PropTypes.bool,
@@ -101,6 +124,7 @@ const mapStateToProps = createStructuredSelector({
   request: makeSelectRequest(),
   errorExecRequest: selectErrorExecRequest(),
   loadingExecRequest: selectLoadingExecRequest(),
+  requestList: selectRequestList(),
 });
 
 function mapDispatchToProps(dispatch) {
@@ -111,6 +135,7 @@ function mapDispatchToProps(dispatch) {
       if (evt !== undefined && evt.preventDefault) evt.preventDefault();
       dispatch(sendExecRequest());
     },
+    sendRequestList: () => dispatch(sendRequestList()),
   };
 }
 

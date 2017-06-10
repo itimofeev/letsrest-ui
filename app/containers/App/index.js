@@ -12,7 +12,6 @@ import styled from 'styled-components';
 
 import withProgressBar from 'components/ProgressBar';
 
-import AppBar from 'material-ui/AppBar';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
 const AppWrapper = styled.div`
@@ -27,10 +26,6 @@ export function App(props) {
   return (
     <MuiThemeProvider>
       <AppWrapper>
-        <AppBar
-          title="Title"
-          iconClassNameRight="muidocs-icon-navigation-expand-more"
-        />
         <Helmet
           titleTemplate="%s - React.js Boilerplate"
           defaultTitle="React.js Boilerplate"

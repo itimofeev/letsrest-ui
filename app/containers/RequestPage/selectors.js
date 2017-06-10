@@ -24,6 +24,11 @@ const selectLoadingExecRequest = () => createSelector(
   (requestPageState) => requestPageState.get('loadingExecRequest')
 );
 
+const selectRequestList = () => createSelector(
+  selectRequestPageDomain(),
+  (requestPageState) => requestPageState.get('requestList')
+);
+
 /**
  * Default selector used by RequestPage
  */
@@ -39,4 +44,5 @@ export {
   makeSelectRequest,
   selectErrorExecRequest,
   selectLoadingExecRequest,
+  selectRequestList,
 };

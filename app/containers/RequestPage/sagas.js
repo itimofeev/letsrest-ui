@@ -2,7 +2,14 @@ import { fromJS } from 'immutable';
 import { LOCATION_CHANGE } from 'react-router-redux';
 import { cancel, put, call, take, select, takeLatest } from 'redux-saga/effects';
 import request from 'utils/request';
-import { SEND_EXEC_REQUEST, sendExecRequestSuccess, sendExecRequestError } from './actions';
+import {
+  SEND_EXEC_REQUEST,
+  SEND_REQUEST_LIST,
+  sendExecRequestSuccess,
+  sendExecRequestError,
+  sendRequestListSuccess,
+  sendRequestListError,
+} from './actions';
 import { makeSelectRequest } from './selectors';
 
 function* sendCreateRequest() {
@@ -52,8 +59,24 @@ export function* sendExecRequest() {
   }
 }
 
+export function* sendRequestList() {
+  const requestList = [
+    {
+      id: '12',
+      name: 'hello',
+    },
+  ];
+  yield put(sendRequestListSuccess(fromJS(requestList)));
+}
+
 export function* sendExecRequestData() {
   const watcher = yield takeLatest(SEND_EXEC_REQUEST, sendExecRequest);
+  yield take(LOCATION_CHANGE);
+  yield cancel(watcher);
+}
+
+export function* sendExecRequestListData() {
+  const watcher = yield takeLatest(SEND_REQUEST_LIST, sendRequestList);
   yield take(LOCATION_CHANGE);
   yield cancel(watcher);
 }
@@ -61,4 +84,5 @@ export function* sendExecRequestData() {
 // All sagas to be loaded
 export default [
   sendExecRequestData,
+  sendExecRequestListData,
 ];

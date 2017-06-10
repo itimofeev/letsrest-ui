@@ -9,8 +9,13 @@ import {
   SEND_EXEC_REQUEST,
   SEND_EXEC_REQUEST_SUCCESS,
   SEND_EXEC_REQUEST_ERROR,
+
   REQUEST_METHOD_CHANGE,
   REQUEST_URL_CHANGE,
+
+  SEND_REQUEST_LIST,
+  SEND_REQUEST_LIST_SUCCESS,
+  SEND_REQUEST_LIST_ERROR,
 } from './actions';
 
 // The initial state of the App
@@ -23,8 +28,12 @@ const initialState = fromJS({
       url: '',
     },
   },
+  requestList: [],
   errorExecRequest: false,
   loadingExecRequest: false,
+
+  errorRequestList: false,
+  loadingRequestList: false,
 });
 
 function requestPageReducer(state = initialState, action) {
@@ -41,6 +50,20 @@ function requestPageReducer(state = initialState, action) {
       return state
         .set('request', action.request)
         .set('loadingExecRequest', false);
+
+    case SEND_REQUEST_LIST:
+      return state
+        .set('errorRequestList', false)
+        .set('loadingRequestList', true);
+    case SEND_REQUEST_LIST_ERROR:
+      return state
+        .set('errorRequestList', action.error)
+        .set('loadingRequestList', false);
+    case SEND_REQUEST_LIST_SUCCESS:
+      return state
+        .set('requestList', action.requestList)
+        .set('loadingRequestList', false);
+
     case REQUEST_METHOD_CHANGE:
       return state
         .setIn(['request', 'data', 'method'], action.method);
