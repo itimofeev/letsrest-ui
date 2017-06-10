@@ -8,18 +8,16 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import MenuItem from 'material-ui/MenuItem';
-import update from 'react-addons-update';
 // import { FormattedMessage } from 'react-intl';
-import { bindActionCreators } from 'redux';
 import { createStructuredSelector } from 'reselect';
-import makeSelectRequestPage from './selectors';
+import makeSelectRequestPage, { makeSelectRequest } from './selectors';
 // import messages from './messages';
 import RequestContainer from './RequestContainer';
 import Form from './Form';
 import MethodField from './MethodField';
 import URLField from './URLField';
 import SendButton from './SendButton';
-import { execRequest } from './actions';
+import { sendExecRequest, requestMethodChange, requestUrlChange } from './actions';
 
 
 export class RequestPage extends React.Component { // eslint-disable-line react/prefer-stateless-function
@@ -27,8 +25,6 @@ export class RequestPage extends React.Component { // eslint-disable-line react/
     super(props);
 
     this.handleSubmit = this.handleSubmit.bind(this);
-    this.handleMethodChange = this.handleMethodChange.bind(this);
-    this.handleUrlChange = this.handleUrlChange.bind(this);
 
     this.state = {
       data: {
@@ -40,16 +36,12 @@ export class RequestPage extends React.Component { // eslint-disable-line react/
 
   handleSubmit = (evt) => {
     if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-    this.props.execRequest(this.state);
-  };
-
-  handleMethodChange = (event, index, method) => this.setState((prevState) => update(prevState, { data: { method: { $set: method } } }));
-  handleUrlChange = (event) => {
-    event.persist();
-    this.setState((prevState) => update(prevState, { data: { url: { $set: event.target.value } } }));
+    this.props.sendExecRequest(this.state);
   };
 
   render() {
+    const request = this.props.request;
+    const data = request.get('data');
     return (
       <div>
         <Helmet
@@ -63,8 +55,8 @@ export class RequestPage extends React.Component { // eslint-disable-line react/
           <RequestContainer>
             <MethodField
               floatingLabelText="Method"
-              value={this.state.data.method}
-              onChange={this.handleMethodChange}
+              value={data.get('method')}
+              onChange={this.props.onChangeMethod}
             >
               <MenuItem value={'GET'} primaryText="GET" />
               <MenuItem value={'POST'} primaryText="POST" />
@@ -75,8 +67,8 @@ export class RequestPage extends React.Component { // eslint-disable-line react/
             <URLField
               hintText="URL"
               floatingLabelText="URL"
-              onChange={this.handleUrlChange}
-              value={this.state.data.url}
+              onChange={this.props.onChangeUrl}
+              value={data.get('url')}
             />
 
             <SendButton
@@ -92,17 +84,23 @@ export class RequestPage extends React.Component { // eslint-disable-line react/
 }
 
 RequestPage.propTypes = {
-  execRequest: PropTypes.func.isRequired,
+  sendExecRequest: PropTypes.func.isRequired,
+  onChangeMethod: PropTypes.func.isRequired,
+  onChangeUrl: PropTypes.func.isRequired,
+  request: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = createStructuredSelector({
   RequestPage: makeSelectRequestPage(),
+  request: makeSelectRequest(),
 });
 
 function mapDispatchToProps(dispatch) {
-  return bindActionCreators({
-    execRequest,
-  }, dispatch);
+  return {
+    onChangeMethod: (event, index, method) => dispatch(requestMethodChange(method)),
+    onChangeUrl: (evt) => dispatch(requestUrlChange(evt.target.value)),
+    sendExecRequest,
+  };
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(RequestPage);

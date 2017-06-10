@@ -9,6 +9,10 @@ const selectRequestPageDomain = () => (state) => state.get('requestPage');
  * Other specific selectors
  */
 
+const makeSelectRequest = () => createSelector(
+  selectRequestPageDomain(),
+  (requestPageState) => requestPageState.get('request')
+);
 
 /**
  * Default selector used by RequestPage
@@ -22,4 +26,5 @@ const makeSelectRequestPage = () => createSelector(
 export default makeSelectRequestPage;
 export {
   selectRequestPageDomain,
+  makeSelectRequest,
 };
