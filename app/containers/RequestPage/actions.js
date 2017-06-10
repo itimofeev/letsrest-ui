@@ -4,12 +4,11 @@
  *
  */
 
-import {
-  DEFAULT_ACTION,
-} from './constants';
+export const EXEC_REQUEST = 'app/RequestPage/EXEC_REQUEST';
 
-export function defaultAction() {
+
+export function execRequest(request) {
   return {
-    type: DEFAULT_ACTION,
+    type: EXEC_REQUEST,
   };
 }

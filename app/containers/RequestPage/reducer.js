@@ -6,14 +6,14 @@
 
 import { fromJS } from 'immutable';
 import {
-  DEFAULT_ACTION,
-} from './constants';
+  EXEC_REQUEST,
+} from './actions';
 
 const initialState = fromJS({});
 
 function requestPageReducer(state = initialState, action) {
   switch (action.type) {
-    case DEFAULT_ACTION:
+    case EXEC_REQUEST:
       return state;
     default:
       return state;
