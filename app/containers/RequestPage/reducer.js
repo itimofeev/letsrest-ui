@@ -13,9 +13,9 @@ import {
   REQUEST_METHOD_CHANGE,
   REQUEST_URL_CHANGE,
 
-  SEND_REQUEST_LIST,
-  SEND_REQUEST_LIST_SUCCESS,
-  SEND_REQUEST_LIST_ERROR,
+  SEND_GET_REQUEST_LIST,
+  SEND_GET_REQUEST_LIST_SUCCESS,
+  SEND_GET_REQUEST_LIST_ERROR,
 } from './actions';
 
 // The initial state of the App
@@ -51,15 +51,15 @@ function requestPageReducer(state = initialState, action) {
         .set('request', action.request)
         .set('loadingExecRequest', false);
 
-    case SEND_REQUEST_LIST:
+    case SEND_GET_REQUEST_LIST:
       return state
         .set('errorRequestList', false)
         .set('loadingRequestList', true);
-    case SEND_REQUEST_LIST_ERROR:
+    case SEND_GET_REQUEST_LIST_ERROR:
       return state
         .set('errorRequestList', action.error)
         .set('loadingRequestList', false);
-    case SEND_REQUEST_LIST_SUCCESS:
+    case SEND_GET_REQUEST_LIST_SUCCESS:
       return state
         .set('requestList', action.requestList)
         .set('loadingRequestList', false);

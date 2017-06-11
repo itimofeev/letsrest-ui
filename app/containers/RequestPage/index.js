@@ -10,6 +10,9 @@ import Helmet from 'react-helmet';
 import MenuItem from 'material-ui/MenuItem';
 import AppBar from 'material-ui/AppBar';
 import Drawer from 'material-ui/Drawer';
+import IconButton from 'material-ui/IconButton';
+// import NavigationClose from 'material-ui/svg-icons/navigation/close';
+import ActionAutorenew from 'material-ui/svg-icons/action/autorenew';
 // import { FormattedMessage } from 'react-intl';
 import { createStructuredSelector } from 'reselect';
 import makeSelectRequestPage, {
@@ -24,7 +27,7 @@ import Form from './Form';
 import MethodField from './MethodField';
 import URLField from './URLField';
 import SendButton from './SendButton';
-import { sendExecRequest, requestMethodChange, requestUrlChange, sendRequestList } from './actions';
+import { sendExecRequest, requestMethodChange, requestUrlChange, sendGetRequestList } from './actions';
 
 
 export class RequestPage extends React.Component { // eslint-disable-line react/prefer-stateless-function
@@ -41,7 +44,7 @@ export class RequestPage extends React.Component { // eslint-disable-line react/
     let submitButtonRender = (<SendButton
       label="Send"
       primary
-      onClick={this.props.sendRequestList}
+      onClick={this.props.onSubmitForm}
     />);
     if (loading) {
       submitButtonRender = (<SendButton
@@ -60,7 +63,10 @@ export class RequestPage extends React.Component { // eslint-disable-line react/
         <Drawer open>
           <AppBar
             title="Title"
-            iconClassNameRight="muidocs-icon-navigation-expand-more"
+            // iconElementLeft={<IconButton><NavigationClose /></IconButton>}
+            iconElementRight={<IconButton><ActionAutorenew /></IconButton>}
+            onRightIconButtonTouchTap={this.props.sendRequestList}
+            zDepth={0}
           />
 
           {this.props.requestList.map((h, i) =>
@@ -135,7 +141,7 @@ function mapDispatchToProps(dispatch) {
       if (evt !== undefined && evt.preventDefault) evt.preventDefault();
       dispatch(sendExecRequest());
     },
-    sendRequestList: () => dispatch(sendRequestList()),
+    sendRequestList: () => dispatch(sendGetRequestList()),
   };
 }
 

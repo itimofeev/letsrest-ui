@@ -4,11 +4,12 @@ import { cancel, put, call, take, select, takeLatest } from 'redux-saga/effects'
 import request from 'utils/request';
 import {
   SEND_EXEC_REQUEST,
-  SEND_REQUEST_LIST,
+  SEND_GET_REQUEST_LIST,
   sendExecRequestSuccess,
   sendExecRequestError,
-  sendRequestListSuccess,
-  sendRequestListError,
+  sendGetRequestList,
+  sendGetRequestListSuccess,
+  sendGetRequestListError,
 } from './actions';
 import { makeSelectRequest } from './selectors';
 
@@ -35,6 +36,7 @@ export function* sendExecRequest() {
     try {
       const created = yield call(sendCreateRequest);
       req = req.set('id', created.id);
+      yield put(sendGetRequestList());
     } catch (err) {
       yield put(sendExecRequestError(err));
       return;
@@ -60,13 +62,22 @@ export function* sendExecRequest() {
 }
 
 export function* sendRequestList() {
-  const requestList = [
-    {
-      id: '12',
-      name: 'hello',
+  const requestURL = '/api/v1/requests';
+  const method = 'GET';
+  const options = {
+    method,
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
     },
-  ];
-  yield put(sendRequestListSuccess(fromJS(requestList)));
+  };
+
+  try {
+    const json = yield call(request, requestURL, options);
+    yield put(sendGetRequestListSuccess(fromJS(json)));
+  } catch (err) {
+    yield put(sendGetRequestListError(err));
+  }
 }
 
 export function* sendExecRequestData() {
@@ -76,7 +87,7 @@ export function* sendExecRequestData() {
 }
 
 export function* sendExecRequestListData() {
-  const watcher = yield takeLatest(SEND_REQUEST_LIST, sendRequestList);
+  const watcher = yield takeLatest(SEND_GET_REQUEST_LIST, sendRequestList);
   yield take(LOCATION_CHANGE);
   yield cancel(watcher);
 }
