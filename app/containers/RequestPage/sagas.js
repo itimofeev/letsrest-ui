@@ -21,6 +21,9 @@ import {
 import { makeSelectRequest, selectAuthToken } from './selectors';
 
 function* sendCreateRequest() {
+  yield call(loadAuthToken);
+
+  const authToken = yield select(selectAuthToken());
   const req = yield select(makeSelectRequest());
   const data = req.get('data');
 
@@ -31,6 +34,7 @@ function* sendCreateRequest() {
     headers: {
       Accept: 'application/json',
       'Content-Type': 'application/json',
+      Authorization: `Bearer ${authToken}`,
     },
     body: JSON.stringify({
       name: `${data.get('method')} ${data.get('url')}`,
@@ -53,6 +57,8 @@ export function* sendExecRequest() {
       return;
     }
   }
+
+  const authToken = yield select(selectAuthToken());
   const requestURL = `/api/v1/requests/${req.get('id')}`;
   const method = 'PUT';
   const options = {
@@ -60,6 +66,7 @@ export function* sendExecRequest() {
     headers: {
       Accept: 'application/json',
       'Content-Type': 'application/json',
+      Authorization: `Bearer ${authToken}`,
     },
     body: JSON.stringify(req.get('data')),
   };
@@ -80,6 +87,7 @@ export function* tryLoadResponseUntilDone() {
 
 function* loadRequestUntilDone() {
   const req = yield select(makeSelectRequest());
+  const authToken = yield select(selectAuthToken());
 
   try {
     for (let i = 0; i < 10; i += 1) {
@@ -90,6 +98,7 @@ function* loadRequestUntilDone() {
         headers: {
           Accept: 'application/json',
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${authToken}`,
         },
       };
 
@@ -121,6 +130,8 @@ function* loadRequestUntilDone() {
 }
 
 export function* sendRequestList() {
+  yield call(loadAuthToken);
+
   const authToken = yield select(selectAuthToken());
   const requestURL = '/api/v1/requests';
   const method = 'GET';
