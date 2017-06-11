@@ -7,6 +7,7 @@
 
 // Needed for redux-saga es6 generator support
 import 'babel-polyfill';
+import Logger from 'js-logger';
 
 import injectTapEventPlugin from 'react-tap-event-plugin';
 
@@ -126,6 +127,8 @@ if (!window.Intl) {
 } else {
   render(translationMessages);
 }
+
+Logger.useDefaults();
 
 // Install ServiceWorker and AppCache in the end since
 // it's not most important operation and if main code fails,

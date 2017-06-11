@@ -11,6 +11,8 @@ import {
   SEND_EXEC_REQUEST_ERROR,
   REQUEST_CREATE_SUCCESS,
 
+  SET_AUTH_TOKEN,
+
   REQUEST_METHOD_CHANGE,
   REQUEST_URL_CHANGE,
 
@@ -33,6 +35,7 @@ const initialState = fromJS({
       error: '',
     },
   },
+  authToken: '',
   requestList: [],
   errorExecRequest: false,
   loadingExecRequest: false,
@@ -58,6 +61,9 @@ function requestPageReducer(state = initialState, action) {
     case REQUEST_CREATE_SUCCESS:
       return state
         .set('request', action.request);
+
+    case SET_AUTH_TOKEN:
+      return state.set('authToken', action.authToken);
 
     case SEND_GET_REQUEST_LIST:
       return state

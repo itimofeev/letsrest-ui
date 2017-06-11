@@ -1,12 +1,16 @@
 import { fromJS } from 'immutable';
+import Logger from 'js-logger';
 import { LOCATION_CHANGE } from 'react-router-redux';
 import { delay } from 'redux-saga';
 import { cancel, cancelled, fork, put, call, take, select, takeLatest } from 'redux-saga/effects';
 import request from 'utils/request';
+import { getAuthTokenOrNull, storeAuthToken } from '../../utils/localStorageHelper';
 import {
   SEND_EXEC_REQUEST,
   SEND_GET_REQUEST_LIST,
   CANCEL_EXEC_REQUEST,
+  LOAD_AUTH_TOKEN,
+  setAuthToken,
   sendExecRequestSuccess,
   sendExecRequestError,
   sendGetRequestList,
@@ -14,21 +18,22 @@ import {
   sendGetRequestListError,
   requestCreateSuccess,
 } from './actions';
-import { makeSelectRequest } from './selectors';
+import { makeSelectRequest, selectAuthToken } from './selectors';
 
 function* sendCreateRequest() {
   const req = yield select(makeSelectRequest());
+  const data = req.get('data');
 
   const requestURL = '/api/v1/requests';
-  const method = 'POST';
+
   const options = {
-    method,
+    method: 'POST',
     headers: {
       Accept: 'application/json',
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      name: req.get('data').get('url'),
+      name: `${data.get('method')} ${data.get('url')}`,
     }),
   };
 
@@ -116,8 +121,35 @@ function* loadRequestUntilDone() {
 }
 
 export function* sendRequestList() {
+  const authToken = yield select(selectAuthToken());
   const requestURL = '/api/v1/requests';
   const method = 'GET';
+  const options = {
+    method,
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${authToken}`,
+    },
+  };
+
+  try {
+    const json = yield call(request, requestURL, options);
+    yield put(sendGetRequestListSuccess(fromJS(json)));
+  } catch (err) {
+    yield put(sendGetRequestListError(err));
+  }
+}
+
+export function* loadAuthToken() {
+  const authToken = getAuthTokenOrNull();
+  if (authToken) {
+    yield put(setAuthToken(authToken));
+    return;
+  }
+
+  const requestURL = '/api/v1/authTokens';
+  const method = 'POST';
   const options = {
     method,
     headers: {
@@ -128,9 +160,10 @@ export function* sendRequestList() {
 
   try {
     const json = yield call(request, requestURL, options);
-    yield put(sendGetRequestListSuccess(fromJS(json)));
+    storeAuthToken(json.auth_token);
+    yield put(setAuthToken(json.auth_token));
   } catch (err) {
-    yield put(sendGetRequestListError(err));
+    Logger.error('Requesting authTokens', err);
   }
 }
 
@@ -146,8 +179,15 @@ export function* sendExecRequestListData() {
   yield cancel(watcher);
 }
 
+export function* loadAuthTokenData() {
+  const watcher = yield takeLatest(LOAD_AUTH_TOKEN, loadAuthToken);
+  yield take(LOCATION_CHANGE);
+  yield cancel(watcher);
+}
+
 // All sagas to be loaded
 export default [
   sendExecRequestData,
   sendExecRequestListData,
+  loadAuthTokenData,
 ];

@@ -29,6 +29,11 @@ const selectRequestList = () => createSelector(
   (requestPageState) => requestPageState.get('requestList')
 );
 
+const selectAuthToken = () => createSelector(
+  selectRequestPageDomain(),
+  (requestPageState) => requestPageState.get('authToken')
+);
+
 /**
  * Default selector used by RequestPage
  */
@@ -45,4 +50,5 @@ export {
   selectErrorExecRequest,
   selectLoadingExecRequest,
   selectRequestList,
+  selectAuthToken,
 };

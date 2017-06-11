@@ -33,10 +33,15 @@ import {
   requestUrlChange,
   sendGetRequestList,
   cancelExecRequest,
+  loadAuthToken,
 } from './actions';
 
 
 export class RequestPage extends React.Component { // eslint-disable-line react/prefer-stateless-function
+
+  componentWillMount() {
+    this.props.initAuthToken();
+  }
 
   componentDidMount() {
     this.props.sendRequestList();
@@ -145,6 +150,7 @@ RequestPage.propTypes = {
   onSubmitForm: PropTypes.func.isRequired,
   cancelExecRequest: PropTypes.func.isRequired,
   sendRequestList: PropTypes.func.isRequired,
+  initAuthToken: PropTypes.func.isRequired,
   request: PropTypes.object.isRequired,
   requestList: PropTypes.object.isRequired,
   errorExecRequest: React.PropTypes.oneOfType([
@@ -172,6 +178,7 @@ function mapDispatchToProps(dispatch) {
     },
     sendRequestList: () => dispatch(sendGetRequestList()),
     cancelExecRequest: () => dispatch(cancelExecRequest()),
+    initAuthToken: () => dispatch(loadAuthToken()),
   };
 }
 

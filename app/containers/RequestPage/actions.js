@@ -18,6 +18,20 @@ export const SEND_GET_REQUEST_LIST_ERROR = 'app/RequestPage/SEND_GET_REQUEST_LIS
 export const REQUEST_METHOD_CHANGE = 'app/RequestPage/REQUEST_METHOD_CHANGE';
 export const REQUEST_URL_CHANGE = 'app/RequestPage/REQUEST_URL_CHANGE';
 
+export const LOAD_AUTH_TOKEN = 'app/App/LOAD_AUTH_TOKEN';
+export const SET_AUTH_TOKEN = 'app/App/SET_AUTH_TOKEN';
+
+export function loadAuthToken() {
+  return {
+    type: LOAD_AUTH_TOKEN,
+  };
+}
+export function setAuthToken(authToken) {
+  return {
+    type: SET_AUTH_TOKEN,
+    authToken,
+  };
+}
 
 export function requestCreateSuccess(request) {
   return {
