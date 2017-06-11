@@ -6,8 +6,12 @@
 import { defineMessages } from 'react-intl';
 
 export default defineMessages({
-  header: {
-    id: 'app.containers.RequestPage.header',
-    defaultMessage: 'This is RequestPage container !',
+  send: {
+    id: 'app.containers.RequestPage.send',
+    defaultMessage: 'Send',
+  },
+  cancel: {
+    id: 'app.containers.RequestPage.cancel',
+    defaultMessage: 'Cancel',
   },
 });

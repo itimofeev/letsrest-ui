@@ -13,7 +13,7 @@ import Drawer from 'material-ui/Drawer';
 import IconButton from 'material-ui/IconButton';
 // import NavigationClose from 'material-ui/svg-icons/navigation/close';
 import ActionAutorenew from 'material-ui/svg-icons/action/autorenew';
-// import { FormattedMessage } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import { createStructuredSelector } from 'reselect';
 import makeSelectRequestPage, {
   makeSelectRequest,
@@ -21,13 +21,19 @@ import makeSelectRequestPage, {
   selectLoadingExecRequest,
   selectRequestList,
 } from './selectors';
-// import messages from './messages';
+import messages from './messages';
 import RequestContainer from './RequestContainer';
 import Form from './Form';
 import MethodField from './MethodField';
 import URLField from './URLField';
 import SendButton from './SendButton';
-import { sendExecRequest, requestMethodChange, requestUrlChange, sendGetRequestList } from './actions';
+import {
+  sendExecRequest,
+  requestMethodChange,
+  requestUrlChange,
+  sendGetRequestList,
+  cancelExecRequest,
+} from './actions';
 
 
 export class RequestPage extends React.Component { // eslint-disable-line react/prefer-stateless-function
@@ -39,19 +45,38 @@ export class RequestPage extends React.Component { // eslint-disable-line react/
   render() {
     const request = this.props.request;
     const data = request.get('data');
+    const status = request.get('status');
     const loading = this.props.loadingExecRequest;
 
     let submitButtonRender = (<SendButton
-      label="Send"
+      label={<FormattedMessage {...messages.send} />}
       primary
       onClick={this.props.onSubmitForm}
     />);
     if (loading) {
       submitButtonRender = (<SendButton
-        label="Cancel"
+        label={<FormattedMessage {...messages.cancel} />}
         primary
-        onClick={this.props.onSubmitForm}
+        onClick={this.props.cancelExecRequest}
       />);
+    }
+
+    let responseRender = null;
+    if (status && status.get('status') === 'done') {
+      responseRender = (
+        <div>
+          Response Status: {request.getIn(['response', 'status_code'])}
+        </div>
+      );
+    }
+
+    let errorRender = null;
+    if (this.props.errorExecRequest) {
+      errorRender = (
+        <div>
+          Error: {this.props.errorExecRequest}
+        </div>
+      );
     }
 
     return (
@@ -105,6 +130,9 @@ export class RequestPage extends React.Component { // eslint-disable-line react/
 
             {submitButtonRender}
           </RequestContainer>
+
+          {errorRender}
+          {responseRender}
         </Form>
       </div>
     );
@@ -115,6 +143,7 @@ RequestPage.propTypes = {
   onChangeMethod: PropTypes.func.isRequired,
   onChangeUrl: PropTypes.func.isRequired,
   onSubmitForm: PropTypes.func.isRequired,
+  cancelExecRequest: PropTypes.func.isRequired,
   sendRequestList: PropTypes.func.isRequired,
   request: PropTypes.object.isRequired,
   requestList: PropTypes.object.isRequired,
@@ -142,6 +171,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(sendExecRequest());
     },
     sendRequestList: () => dispatch(sendGetRequestList()),
+    cancelExecRequest: () => dispatch(cancelExecRequest()),
   };
 }
 

@@ -9,6 +9,7 @@ import {
   SEND_EXEC_REQUEST,
   SEND_EXEC_REQUEST_SUCCESS,
   SEND_EXEC_REQUEST_ERROR,
+  REQUEST_CREATE_SUCCESS,
 
   REQUEST_METHOD_CHANGE,
   REQUEST_URL_CHANGE,
@@ -26,6 +27,10 @@ const initialState = fromJS({
     data: {
       method: 'GET',
       url: '',
+    },
+    status: {
+      status: '',
+      error: '',
     },
   },
   requestList: [],
@@ -50,6 +55,9 @@ function requestPageReducer(state = initialState, action) {
       return state
         .set('request', action.request)
         .set('loadingExecRequest', false);
+    case REQUEST_CREATE_SUCCESS:
+      return state
+        .set('request', action.request);
 
     case SEND_GET_REQUEST_LIST:
       return state
