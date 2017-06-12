@@ -55,9 +55,7 @@ function requestPageReducer(state = initialState, action) {
         .set('errorExecRequest', action.error)
         .set('loadingExecRequest', false);
     case SEND_EXEC_REQUEST_SUCCESS:
-      return state
-        .set('request', action.request)
-        .set('loadingExecRequest', false);
+      return setRequest(state, action.request);
     case REQUEST_CREATE_SUCCESS:
       return state
         .set('request', action.request);
@@ -87,6 +85,20 @@ function requestPageReducer(state = initialState, action) {
     default:
       return state;
   }
+}
+
+function setRequest(state, request) {
+  const newState = state
+    .set('request', request)
+    .set('errorExecRequest', false)
+    .set('loadingExecRequest', false);
+
+  const requestIndex = state.get('requestList').findIndex((item) => item.get('id') === request.get('id'));
+
+  if (requestIndex === -1) {
+    return newState.update('requestList', (requestList) => requestList.push(request));
+  }
+  return newState.setIn(['requestList', requestIndex], request);
 }
 
 export default requestPageReducer;

@@ -7,6 +7,7 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
+import Logger from 'js-logger';
 import MenuItem from 'material-ui/MenuItem';
 import AppBar from 'material-ui/AppBar';
 import Drawer from 'material-ui/Drawer';
@@ -29,6 +30,7 @@ import URLField from './URLField';
 import SendButton from './SendButton';
 import {
   sendExecRequest,
+  sendExecRequestSuccess,
   requestMethodChange,
   requestUrlChange,
   sendGetRequestList,
@@ -44,7 +46,12 @@ export class RequestPage extends React.Component { // eslint-disable-line react/
   }
 
   componentDidMount() {
+    Logger.debug("Lets's rest :)");
     this.props.sendRequestList();
+    const requestId = window.location.pathname.split('/').slice(-1).pop();
+    if (requestId) {
+      this.props.sendRequestList(requestId);
+    }
   }
 
   render() {
@@ -100,7 +107,7 @@ export class RequestPage extends React.Component { // eslint-disable-line react/
           />
 
           {this.props.requestList.map((h, i) =>
-            <MenuItem key={i}>{h.get('name')}</MenuItem>,
+            <MenuItem key={i} onClick={() => this.props.sendExecRequestSuccess(h)}>{h.get('name')}</MenuItem>,
           )}
         </Drawer>
         <Helmet
@@ -151,6 +158,7 @@ RequestPage.propTypes = {
   cancelExecRequest: PropTypes.func.isRequired,
   sendRequestList: PropTypes.func.isRequired,
   initAuthToken: PropTypes.func.isRequired,
+  sendExecRequestSuccess: PropTypes.func.isRequired,
   request: PropTypes.object.isRequired,
   requestList: PropTypes.object.isRequired,
   errorExecRequest: React.PropTypes.oneOfType([
@@ -176,9 +184,10 @@ function mapDispatchToProps(dispatch) {
       if (evt !== undefined && evt.preventDefault) evt.preventDefault();
       dispatch(sendExecRequest());
     },
-    sendRequestList: () => dispatch(sendGetRequestList()),
+    sendRequestList: (requestId) => dispatch(sendGetRequestList(requestId)),
     cancelExecRequest: () => dispatch(cancelExecRequest()),
     initAuthToken: () => dispatch(loadAuthToken()),
+    sendExecRequestSuccess: (req) => dispatch(sendExecRequestSuccess(req)),
   };
 }
 

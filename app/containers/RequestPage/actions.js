@@ -66,9 +66,10 @@ export function cancelExecRequest() {
   };
 }
 
-export function sendGetRequestList() {
+export function sendGetRequestList(requestId) {
   return {
     type: SEND_GET_REQUEST_LIST,
+    requestId,
   };
 }
 

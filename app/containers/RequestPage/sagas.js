@@ -13,7 +13,6 @@ import {
   setAuthToken,
   sendExecRequestSuccess,
   sendExecRequestError,
-  sendGetRequestList,
   sendGetRequestListSuccess,
   sendGetRequestListError,
   requestCreateSuccess,
@@ -51,7 +50,7 @@ export function* sendExecRequest() {
       const created = yield call(sendCreateRequest);
       req = req.set('id', created.id);
       yield put(requestCreateSuccess(fromJS(req)));
-      yield put(sendGetRequestList());
+      // yield put(sendGetRequestList());
     } catch (err) {
       yield put(sendExecRequestError(err));
       return;
@@ -129,7 +128,7 @@ function* loadRequestUntilDone() {
   }
 }
 
-export function* sendRequestList() {
+export function* sendRequestList(action) {
   yield call(loadAuthToken);
 
   const authToken = yield select(selectAuthToken());
@@ -146,9 +145,20 @@ export function* sendRequestList() {
 
   try {
     const json = yield call(request, requestURL, options);
-    yield put(sendGetRequestListSuccess(fromJS(json)));
+    const requestList = fromJS(json);
+    yield put(sendGetRequestListSuccess(requestList));
+    yield call(selectRequestIfNeeded, requestList, action);
   } catch (err) {
     yield put(sendGetRequestListError(err));
+  }
+}
+
+function* selectRequestIfNeeded(requestList, action) {
+  if (action.requestId) {
+    const requestIndex = requestList.findIndex((item) => item.get('id') === action.requestId);
+    if (requestIndex !== -1) {
+      yield put(sendExecRequestSuccess(requestList.get(requestIndex)));
+    }
   }
 }
 
