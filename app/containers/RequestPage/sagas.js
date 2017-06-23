@@ -15,7 +15,7 @@ import {
   sendExecRequestError,
   sendGetRequestListSuccess,
   sendGetRequestListError,
-  requestCreateSuccess,
+  requestCreateSuccess, SEND_GET_REQUEST, sendGetRequestSuccess, sendGetRequestError,
 } from './actions';
 import { makeSelectRequest, selectAuthToken } from './selectors';
 
@@ -128,7 +128,7 @@ function* loadRequestUntilDone() {
   }
 }
 
-export function* sendRequestList(action) {
+export function* sendRequestList() {
   yield call(loadAuthToken);
 
   const authToken = yield select(selectAuthToken());
@@ -147,18 +147,32 @@ export function* sendRequestList(action) {
     const json = yield call(request, requestURL, options);
     const requestList = fromJS(json);
     yield put(sendGetRequestListSuccess(requestList));
-    yield call(selectRequestIfNeeded, requestList, action);
   } catch (err) {
     yield put(sendGetRequestListError(err));
   }
 }
 
-function* selectRequestIfNeeded(requestList, action) {
-  if (action.requestId) {
-    const requestIndex = requestList.findIndex((item) => item.get('id') === action.requestId);
-    if (requestIndex !== -1) {
-      yield put(sendExecRequestSuccess(requestList.get(requestIndex)));
-    }
+export function* sendGetRequest(action) {
+  yield call(loadAuthToken);
+
+  const authToken = yield select(selectAuthToken());
+  const requestURL = `/api/v1/requests/${action.requestId}`;
+  const method = 'GET';
+  const options = {
+    method,
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${authToken}`,
+    },
+  };
+
+  try {
+    const json = yield call(request, requestURL, options);
+    const requestJson = fromJS(json);
+    yield put(sendGetRequestSuccess(requestJson));
+  } catch (err) {
+    yield put(sendGetRequestError(err));
   }
 }
 
@@ -194,8 +208,14 @@ export function* sendExecRequestData() {
   yield cancel(watcher);
 }
 
-export function* sendExecRequestListData() {
+export function* sendGetRequestListData() {
   const watcher = yield takeLatest(SEND_GET_REQUEST_LIST, sendRequestList);
+  yield take(LOCATION_CHANGE);
+  yield cancel(watcher);
+}
+
+export function* sendGetRequestData() {
+  const watcher = yield takeLatest(SEND_GET_REQUEST, sendGetRequest);
   yield take(LOCATION_CHANGE);
   yield cancel(watcher);
 }
@@ -209,6 +229,7 @@ export function* loadAuthTokenData() {
 // All sagas to be loaded
 export default [
   sendExecRequestData,
-  sendExecRequestListData,
+  sendGetRequestListData,
+  sendGetRequestData,
   loadAuthTokenData,
 ];

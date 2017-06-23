@@ -36,6 +36,7 @@ import {
   sendGetRequestList,
   cancelExecRequest,
   loadAuthToken,
+  sendGetRequest,
 } from './actions';
 
 
@@ -49,8 +50,8 @@ export class RequestPage extends React.Component { // eslint-disable-line react/
     Logger.debug("Lets's rest :)");
     this.props.sendRequestList();
     const requestId = window.location.pathname.split('/').slice(-1).pop();
-    if (requestId) {
-      this.props.sendRequestList(requestId);
+    if (requestId && requestId !== 'request') {
+      this.props.sendGetRequest(requestId);
     }
   }
 
@@ -157,6 +158,7 @@ RequestPage.propTypes = {
   onSubmitForm: PropTypes.func.isRequired,
   cancelExecRequest: PropTypes.func.isRequired,
   sendRequestList: PropTypes.func.isRequired,
+  sendGetRequest: PropTypes.func.isRequired,
   initAuthToken: PropTypes.func.isRequired,
   sendExecRequestSuccess: PropTypes.func.isRequired,
   request: PropTypes.object.isRequired,
@@ -188,6 +190,7 @@ function mapDispatchToProps(dispatch) {
     cancelExecRequest: () => dispatch(cancelExecRequest()),
     initAuthToken: () => dispatch(loadAuthToken()),
     sendExecRequestSuccess: (req) => dispatch(sendExecRequestSuccess(req)),
+    sendGetRequest: (req) => dispatch(sendGetRequest(req)),
   };
 }
 

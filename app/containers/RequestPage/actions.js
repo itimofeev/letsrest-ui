@@ -15,6 +15,11 @@ export const SEND_GET_REQUEST_LIST = 'app/RequestPage/SEND_GET_REQUEST_LIST';
 export const SEND_GET_REQUEST_LIST_SUCCESS = 'app/RequestPage/SEND_GET_REQUEST_LIST_SUCCESS';
 export const SEND_GET_REQUEST_LIST_ERROR = 'app/RequestPage/SEND_GET_REQUEST_LIST_ERROR';
 
+
+export const SEND_GET_REQUEST = 'app/RequestPage/SEND_GET_REQUEST';
+export const SEND_GET_REQUEST_SUCCESS = 'app/RequestPage/SEND_GET_REQUEST_SUCCESS';
+export const SEND_GET_REQUEST_ERROR = 'app/RequestPage/SEND_GET_REQUEST_ERROR';
+
 export const REQUEST_METHOD_CHANGE = 'app/RequestPage/REQUEST_METHOD_CHANGE';
 export const REQUEST_URL_CHANGE = 'app/RequestPage/REQUEST_URL_CHANGE';
 
@@ -66,10 +71,9 @@ export function cancelExecRequest() {
   };
 }
 
-export function sendGetRequestList(requestId) {
+export function sendGetRequestList() {
   return {
     type: SEND_GET_REQUEST_LIST,
-    requestId,
   };
 }
 
@@ -83,6 +87,27 @@ export function sendGetRequestListSuccess(requestList) {
 export function sendGetRequestListError(error) {
   return {
     type: SEND_GET_REQUEST_LIST_ERROR,
+    error,
+  };
+}
+
+export function sendGetRequest(requestId) {
+  return {
+    type: SEND_GET_REQUEST,
+    requestId,
+  };
+}
+
+export function sendGetRequestSuccess(request) {
+  return {
+    type: SEND_GET_REQUEST_SUCCESS,
+    request,
+  };
+}
+
+export function sendGetRequestError(error) {
+  return {
+    type: SEND_GET_REQUEST_ERROR,
     error,
   };
 }

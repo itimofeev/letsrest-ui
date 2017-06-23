@@ -18,7 +18,7 @@ import {
 
   SEND_GET_REQUEST_LIST,
   SEND_GET_REQUEST_LIST_SUCCESS,
-  SEND_GET_REQUEST_LIST_ERROR,
+  SEND_GET_REQUEST_LIST_ERROR, SEND_GET_REQUEST, SEND_GET_REQUEST_ERROR, SEND_GET_REQUEST_SUCCESS,
 } from './actions';
 
 // The initial state of the App
@@ -62,6 +62,17 @@ function requestPageReducer(state = initialState, action) {
 
     case SET_AUTH_TOKEN:
       return state.set('authToken', action.authToken);
+
+    case SEND_GET_REQUEST:
+      return state
+        .set('errorExecRequest', false)
+        .set('loadingExecRequest', true);
+    case SEND_GET_REQUEST_ERROR:
+      return state
+        .set('errorExecRequest', action.error)
+        .set('loadingExecRequest', false);
+    case SEND_GET_REQUEST_SUCCESS:
+      return setRequest(state, action.request);
 
     case SEND_GET_REQUEST_LIST:
       return state
