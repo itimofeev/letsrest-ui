@@ -14,4 +14,8 @@ export default defineMessages({
     id: 'app.containers.RequestPage.cancel',
     defaultMessage: 'Cancel',
   },
+  copyRequest: {
+    id: 'app.containers.RequestPage.copyRequest',
+    defaultMessage: 'Copy',
+  },
 });

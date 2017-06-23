@@ -15,6 +15,7 @@ export const SEND_GET_REQUEST_LIST = 'app/RequestPage/SEND_GET_REQUEST_LIST';
 export const SEND_GET_REQUEST_LIST_SUCCESS = 'app/RequestPage/SEND_GET_REQUEST_LIST_SUCCESS';
 export const SEND_GET_REQUEST_LIST_ERROR = 'app/RequestPage/SEND_GET_REQUEST_LIST_ERROR';
 
+export const SEND_COPY_REQUEST = 'app/RequestPage/SEND_COPY_REQUEST';
 
 export const SEND_GET_REQUEST = 'app/RequestPage/SEND_GET_REQUEST';
 export const SEND_GET_REQUEST_SUCCESS = 'app/RequestPage/SEND_GET_REQUEST_SUCCESS';
@@ -109,6 +110,13 @@ export function sendGetRequestError(error) {
   return {
     type: SEND_GET_REQUEST_ERROR,
     error,
+  };
+}
+
+
+export function sendCopyRequest() {
+  return {
+    type: SEND_COPY_REQUEST,
   };
 }
 

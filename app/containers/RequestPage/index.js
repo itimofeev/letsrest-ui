@@ -38,6 +38,7 @@ import {
   cancelExecRequest,
   loadAuthToken,
   sendGetRequest,
+  sendCopyRequest,
 } from './actions';
 
 
@@ -61,7 +62,7 @@ export class RequestPage extends React.Component { // eslint-disable-line react/
     const data = request.get('data');
     const status = request.get('status');
     const loading = this.props.loadingExecRequest;
-    const ownRequest = !this.props.user || this.props.user.get('id') === this.props.request.get('user_id');
+    const ownRequest = !this.props.user || !this.props.request.get('id') || this.props.user.get('id') === this.props.request.get('user_id');
     const editDisabled = loading || !ownRequest;
 
     let submitButtonRender = (<SendButton
@@ -74,6 +75,13 @@ export class RequestPage extends React.Component { // eslint-disable-line react/
         label={<FormattedMessage {...messages.cancel} />}
         primary
         onClick={this.props.cancelExecRequest}
+      />);
+    }
+    if (!ownRequest) {
+      submitButtonRender = (<SendButton
+        label={<FormattedMessage {...messages.copyRequest} />}
+        primary
+        onClick={this.props.sendCopyRequest}
       />);
     }
 
@@ -162,6 +170,7 @@ RequestPage.propTypes = {
   sendRequestList: PropTypes.func.isRequired,
   sendGetRequest: PropTypes.func.isRequired,
   initAuthToken: PropTypes.func.isRequired,
+  sendCopyRequest: PropTypes.func.isRequired,
   sendExecRequestSuccess: PropTypes.func.isRequired,
   request: PropTypes.object.isRequired,
   requestList: PropTypes.object.isRequired,
@@ -201,6 +210,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(push(`/request/${req.get('id')}`));
     },
     sendGetRequest: (req) => dispatch(sendGetRequest(req)),
+    sendCopyRequest: () => dispatch(sendCopyRequest()),
   };
 }
 

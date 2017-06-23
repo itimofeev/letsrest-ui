@@ -10,12 +10,16 @@ import {
   SEND_GET_REQUEST_LIST,
   CANCEL_EXEC_REQUEST,
   LOAD_AUTH_TOKEN,
+  SEND_GET_REQUEST,
+  SEND_COPY_REQUEST,
   setAuthToken,
   sendExecRequestSuccess,
   sendExecRequestError,
   sendGetRequestListSuccess,
   sendGetRequestListError,
-  requestCreateSuccess, SEND_GET_REQUEST, sendGetRequestSuccess, sendGetRequestError,
+  requestCreateSuccess,
+  sendGetRequestSuccess,
+  sendGetRequestError,
 } from './actions';
 import { makeSelectRequest, selectAuthToken } from './selectors';
 
@@ -177,6 +181,33 @@ export function* sendGetRequest(action) {
   }
 }
 
+export function* sendCopyRequest() {
+  yield call(loadAuthToken);
+
+  const authToken = yield select(selectAuthToken());
+  const req = yield select(makeSelectRequest());
+
+  const requestURL = `/api/v1/requests/${req.get('id')}/copy`;
+  const method = 'POST';
+  const options = {
+    method,
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${authToken}`,
+    },
+  };
+
+  try {
+    const json = yield call(request, requestURL, options);
+    const requestJson = fromJS(json);
+    yield put(sendExecRequestSuccess(requestJson));
+    yield put(push(`/request/${requestJson.get('id')}`));
+  } catch (err) {
+    yield put(sendExecRequestError(err));
+  }
+}
+
 export function* loadAuthToken() {
   const authToken = getAuthTokenOrNull();
   if (authToken) {
@@ -221,6 +252,12 @@ export function* sendGetRequestData() {
   yield cancel(watcher);
 }
 
+export function* sendCopyRequestData() {
+  const watcher = yield takeLatest(SEND_COPY_REQUEST, sendCopyRequest);
+  yield take(LOCATION_CHANGE);
+  yield cancel(watcher);
+}
+
 export function* loadAuthTokenData() {
   const watcher = yield takeLatest(LOAD_AUTH_TOKEN, loadAuthToken);
   yield take(LOCATION_CHANGE);
@@ -233,4 +270,5 @@ export default [
   sendGetRequestListData,
   sendGetRequestData,
   loadAuthTokenData,
+  sendCopyRequestData,
 ];
