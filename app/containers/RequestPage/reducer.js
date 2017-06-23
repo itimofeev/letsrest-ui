@@ -5,6 +5,9 @@
  */
 
 import { fromJS } from 'immutable';
+import jwt_decode from 'jwt-decode';
+import Logger from 'js-logger';
+
 import {
   SEND_EXEC_REQUEST,
   SEND_EXEC_REQUEST_SUCCESS,
@@ -39,6 +42,7 @@ const initialState = fromJS({
   requestList: [],
   errorExecRequest: false,
   loadingExecRequest: false,
+  user: false,
 
   errorRequestList: false,
   loadingRequestList: false,
@@ -61,7 +65,8 @@ function requestPageReducer(state = initialState, action) {
         .set('request', action.request);
 
     case SET_AUTH_TOKEN:
-      return state.set('authToken', action.authToken);
+      return state.set('authToken', action.authToken)
+        .set('user', fromJS({ id: jwt_decode(action.authToken).user_id }));
 
     case SEND_GET_REQUEST:
       return state

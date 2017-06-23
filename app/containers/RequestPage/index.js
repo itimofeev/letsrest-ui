@@ -21,7 +21,7 @@ import makeSelectRequestPage, {
   makeSelectRequest,
   selectErrorExecRequest,
   selectLoadingExecRequest,
-  selectRequestList,
+  selectRequestList, selectUser,
 } from './selectors';
 import messages from './messages';
 import RequestContainer from './RequestContainer';
@@ -61,6 +61,8 @@ export class RequestPage extends React.Component { // eslint-disable-line react/
     const data = request.get('data');
     const status = request.get('status');
     const loading = this.props.loadingExecRequest;
+    const ownRequest = !this.props.user || this.props.user.get('id') === this.props.request.get('user_id');
+    const editDisabled = loading || !ownRequest;
 
     let submitButtonRender = (<SendButton
       label={<FormattedMessage {...messages.send} />}
@@ -120,12 +122,11 @@ export class RequestPage extends React.Component { // eslint-disable-line react/
         />
 
         <Form onSubmit={this.props.onSubmitForm}>
-          ID: {request.get('id')}
           <RequestContainer>
             <MethodField
               floatingLabelText="Method"
               value={data.get('method')}
-              disabled={loading}
+              disabled={editDisabled}
               onChange={this.props.onChangeMethod}
             >
               <MenuItem value={'GET'} primaryText="GET" />
@@ -137,7 +138,7 @@ export class RequestPage extends React.Component { // eslint-disable-line react/
             <URLField
               hintText="URL"
               floatingLabelText="URL"
-              disabled={loading}
+              disabled={editDisabled}
               onChange={this.props.onChangeUrl}
               value={data.get('url')}
             />
@@ -168,6 +169,10 @@ RequestPage.propTypes = {
     React.PropTypes.string,
     React.PropTypes.bool,
   ]),
+  user: React.PropTypes.oneOfType([
+    React.PropTypes.object,
+    React.PropTypes.bool,
+  ]),
   loadingExecRequest: PropTypes.bool.isRequired,
 };
 
@@ -177,6 +182,7 @@ const mapStateToProps = createStructuredSelector({
   errorExecRequest: selectErrorExecRequest(),
   loadingExecRequest: selectLoadingExecRequest(),
   requestList: selectRequestList(),
+  user: selectUser(),
 });
 
 function mapDispatchToProps(dispatch) {
