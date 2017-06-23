@@ -12,6 +12,7 @@ import MenuItem from 'material-ui/MenuItem';
 import AppBar from 'material-ui/AppBar';
 import Drawer from 'material-ui/Drawer';
 import IconButton from 'material-ui/IconButton';
+import { push } from 'react-router-redux';
 // import NavigationClose from 'material-ui/svg-icons/navigation/close';
 import ActionAutorenew from 'material-ui/svg-icons/action/autorenew';
 import { FormattedMessage } from 'react-intl';
@@ -189,7 +190,10 @@ function mapDispatchToProps(dispatch) {
     sendRequestList: (requestId) => dispatch(sendGetRequestList(requestId)),
     cancelExecRequest: () => dispatch(cancelExecRequest()),
     initAuthToken: () => dispatch(loadAuthToken()),
-    sendExecRequestSuccess: (req) => dispatch(sendExecRequestSuccess(req)),
+    sendExecRequestSuccess: (req) => {
+      dispatch(sendExecRequestSuccess(req));
+      dispatch(push(`/request/${req.get('id')}`));
+    },
     sendGetRequest: (req) => dispatch(sendGetRequest(req)),
   };
 }

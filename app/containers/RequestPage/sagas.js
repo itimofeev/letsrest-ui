@@ -1,6 +1,6 @@
 import { fromJS } from 'immutable';
 import Logger from 'js-logger';
-import { LOCATION_CHANGE } from 'react-router-redux';
+import { LOCATION_CHANGE, push } from 'react-router-redux';
 import { delay } from 'redux-saga';
 import { cancel, cancelled, fork, put, call, take, select, takeLatest } from 'redux-saga/effects';
 import request from 'utils/request';
@@ -117,6 +117,7 @@ function* loadRequestUntilDone() {
         return;
       } else {
         yield put(sendExecRequestSuccess(fromJS(loadedReq)));
+        yield put(push(`/request/${loadedReq.id}`));
         return;
       }
     }

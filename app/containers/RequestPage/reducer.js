@@ -72,7 +72,10 @@ function requestPageReducer(state = initialState, action) {
         .set('errorExecRequest', action.error)
         .set('loadingExecRequest', false);
     case SEND_GET_REQUEST_SUCCESS:
-      return setRequest(state, action.request);
+      return state
+        .set('request', action.request)
+        .set('errorExecRequest', false)
+        .set('loadingExecRequest', false);
 
     case SEND_GET_REQUEST_LIST:
       return state
