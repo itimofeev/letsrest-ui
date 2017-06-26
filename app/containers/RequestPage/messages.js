@@ -18,4 +18,8 @@ export default defineMessages({
     id: 'app.containers.RequestPage.copyRequest',
     defaultMessage: 'Copy',
   },
+  newRequest: {
+    id: 'app.containers.RequestPage.newRequest',
+    defaultMessage: 'New',
+  },
 });

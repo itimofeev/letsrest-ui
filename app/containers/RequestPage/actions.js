@@ -27,6 +27,8 @@ export const REQUEST_URL_CHANGE = 'app/RequestPage/REQUEST_URL_CHANGE';
 export const LOAD_AUTH_TOKEN = 'app/App/LOAD_AUTH_TOKEN';
 export const SET_AUTH_TOKEN = 'app/App/SET_AUTH_TOKEN';
 
+export const NEW_REQUEST = 'app/App/NEW_REQUEST';
+
 export function loadAuthToken() {
   return {
     type: LOAD_AUTH_TOKEN,
@@ -131,6 +133,12 @@ export function requestUrlChange(url) {
   return {
     type: REQUEST_URL_CHANGE,
     url,
+  };
+}
+
+export function openNewRequest() {
+  return {
+    type: NEW_REQUEST,
   };
 }
 

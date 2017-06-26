@@ -5,39 +5,41 @@
  */
 
 import { fromJS } from 'immutable';
-import jwt_decode from 'jwt-decode';
-import Logger from 'js-logger';
+import jwtDecode from 'jwt-decode';
 
 import {
   SEND_EXEC_REQUEST,
   SEND_EXEC_REQUEST_SUCCESS,
   SEND_EXEC_REQUEST_ERROR,
   REQUEST_CREATE_SUCCESS,
-
   SET_AUTH_TOKEN,
-
   REQUEST_METHOD_CHANGE,
   REQUEST_URL_CHANGE,
-
   SEND_GET_REQUEST_LIST,
   SEND_GET_REQUEST_LIST_SUCCESS,
-  SEND_GET_REQUEST_LIST_ERROR, SEND_GET_REQUEST, SEND_GET_REQUEST_ERROR, SEND_GET_REQUEST_SUCCESS,
+  SEND_GET_REQUEST_LIST_ERROR,
+  SEND_GET_REQUEST,
+  SEND_GET_REQUEST_ERROR,
+  SEND_GET_REQUEST_SUCCESS,
+  NEW_REQUEST,
 } from './actions';
+
+const initialRequest = fromJS({
+  id: '',
+  name: '',
+  data: {
+    method: 'GET',
+    url: '',
+  },
+  status: {
+    status: '',
+    error: '',
+  },
+});
 
 // The initial state of the App
 const initialState = fromJS({
-  request: {
-    id: '',
-    name: '',
-    data: {
-      method: 'GET',
-      url: '',
-    },
-    status: {
-      status: '',
-      error: '',
-    },
-  },
+  request: initialRequest,
   authToken: '',
   requestList: [],
   errorExecRequest: false,
@@ -66,7 +68,7 @@ function requestPageReducer(state = initialState, action) {
 
     case SET_AUTH_TOKEN:
       return state.set('authToken', action.authToken)
-        .set('user', fromJS({ id: jwt_decode(action.authToken).user_id }));
+        .set('user', fromJS({ id: jwtDecode(action.authToken).user_id }));
 
     case SEND_GET_REQUEST:
       return state
@@ -101,6 +103,11 @@ function requestPageReducer(state = initialState, action) {
     case REQUEST_URL_CHANGE:
       return state
         .setIn(['request', 'data', 'url'], action.url);
+
+    case NEW_REQUEST:
+      return state
+        .set('request', initialRequest);
+
     default:
       return state;
   }

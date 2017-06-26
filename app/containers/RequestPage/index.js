@@ -38,7 +38,7 @@ import {
   cancelExecRequest,
   loadAuthToken,
   sendGetRequest,
-  sendCopyRequest,
+  sendCopyRequest, openNewRequest,
 } from './actions';
 
 
@@ -130,6 +130,11 @@ export class RequestPage extends React.Component { // eslint-disable-line react/
         />
 
         <Form onSubmit={this.props.onSubmitForm}>
+          <SendButton
+            label={<FormattedMessage {...messages.newRequest} />}
+            onClick={this.props.openNewRequest}
+          />
+
           <RequestContainer>
             <MethodField
               floatingLabelText="Method"
@@ -171,6 +176,7 @@ RequestPage.propTypes = {
   sendGetRequest: PropTypes.func.isRequired,
   initAuthToken: PropTypes.func.isRequired,
   sendCopyRequest: PropTypes.func.isRequired,
+  openNewRequest: PropTypes.func.isRequired,
   sendExecRequestSuccess: PropTypes.func.isRequired,
   request: PropTypes.object.isRequired,
   requestList: PropTypes.object.isRequired,
@@ -211,6 +217,10 @@ function mapDispatchToProps(dispatch) {
     },
     sendGetRequest: (req) => dispatch(sendGetRequest(req)),
     sendCopyRequest: () => dispatch(sendCopyRequest()),
+    openNewRequest: () => {
+      dispatch(openNewRequest());
+      dispatch(push('/request'));
+    },
   };
 }
 
