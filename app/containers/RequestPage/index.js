@@ -12,7 +12,7 @@ import MenuItem from 'material-ui/MenuItem';
 import AppBar from 'material-ui/AppBar';
 import Drawer from 'material-ui/Drawer';
 import IconButton from 'material-ui/IconButton';
-import prettyBytes from 'pretty-bytes';
+import prettyByte from 'pretty-byte';
 import prettyMs from 'pretty-ms';
 import { push } from 'react-router-redux';
 // import NavigationClose from 'material-ui/svg-icons/navigation/close';
@@ -93,7 +93,7 @@ export class RequestPage extends React.Component { // eslint-disable-line react/
       responseRender = (
         <div>
           Response Status: {response.get('status_code')},
-          size: {prettyBytes(response.get('body_len'))},
+          size: {prettyByte(response.get('body_len'))},
           duration: {prettyMs(response.get('duration') / 1000000)}
           <ul>
             {request.getIn(['response', 'headers']).map((h, i) =>
