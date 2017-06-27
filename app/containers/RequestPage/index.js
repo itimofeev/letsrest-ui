@@ -90,6 +90,11 @@ export class RequestPage extends React.Component { // eslint-disable-line react/
       responseRender = (
         <div>
           Response Status: {request.getIn(['response', 'status_code'])}
+          <ul>
+            {request.getIn(['response', 'headers']).map((h, i) =>
+              <li key={i}><b>{h.get('name')}</b>: {h.get('value')}</li>,
+            )}
+          </ul>
         </div>
       );
     }
