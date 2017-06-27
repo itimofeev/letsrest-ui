@@ -13,6 +13,7 @@ import AppBar from 'material-ui/AppBar';
 import Drawer from 'material-ui/Drawer';
 import IconButton from 'material-ui/IconButton';
 import prettyBytes from 'pretty-bytes';
+import prettyMs from 'pretty-ms';
 import { push } from 'react-router-redux';
 // import NavigationClose from 'material-ui/svg-icons/navigation/close';
 import ActionAutorenew from 'material-ui/svg-icons/action/autorenew';
@@ -88,9 +89,12 @@ export class RequestPage extends React.Component { // eslint-disable-line react/
 
     let responseRender = null;
     if (status && status.get('status') === 'done') {
+      const response = request.get('response');
       responseRender = (
         <div>
-          Response Status: {request.getIn(['response', 'status_code'])}, size: {prettyBytes(request.getIn(['response', 'body_len']))}
+          Response Status: {response.get('status_code')},
+          size: {prettyBytes(response.get('body_len'))},
+          duration: {prettyMs(response.get('duration') / 1000000)}
           <ul>
             {request.getIn(['response', 'headers']).map((h, i) =>
               <li key={i}><b>{h.get('name')}</b>: {h.get('value')}</li>,
