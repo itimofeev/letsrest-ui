@@ -12,6 +12,7 @@ import MenuItem from 'material-ui/MenuItem';
 import AppBar from 'material-ui/AppBar';
 import Drawer from 'material-ui/Drawer';
 import IconButton from 'material-ui/IconButton';
+import prettyBytes from 'pretty-bytes';
 import { push } from 'react-router-redux';
 // import NavigationClose from 'material-ui/svg-icons/navigation/close';
 import ActionAutorenew from 'material-ui/svg-icons/action/autorenew';
@@ -89,7 +90,7 @@ export class RequestPage extends React.Component { // eslint-disable-line react/
     if (status && status.get('status') === 'done') {
       responseRender = (
         <div>
-          Response Status: {request.getIn(['response', 'status_code'])}
+          Response Status: {request.getIn(['response', 'status_code'])}, size: {prettyBytes(request.getIn(['response', 'body_len']))}
           <ul>
             {request.getIn(['response', 'headers']).map((h, i) =>
               <li key={i}><b>{h.get('name')}</b>: {h.get('value')}</li>,
