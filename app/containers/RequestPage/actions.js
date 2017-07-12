@@ -23,6 +23,7 @@ export const SEND_GET_REQUEST_ERROR = 'app/RequestPage/SEND_GET_REQUEST_ERROR';
 
 export const REQUEST_METHOD_CHANGE = 'app/RequestPage/REQUEST_METHOD_CHANGE';
 export const REQUEST_URL_CHANGE = 'app/RequestPage/REQUEST_URL_CHANGE';
+export const REQUEST_BODY_CHANGE = 'app/RequestPage/REQUEST_BODY_CHANGE';
 
 export const LOAD_AUTH_TOKEN = 'app/App/LOAD_AUTH_TOKEN';
 export const SET_AUTH_TOKEN = 'app/App/SET_AUTH_TOKEN';
@@ -133,6 +134,14 @@ export function requestUrlChange(url) {
   return {
     type: REQUEST_URL_CHANGE,
     url,
+  };
+}
+
+
+export function requestBodyChange(body) {
+  return {
+    type: REQUEST_BODY_CHANGE,
+    body,
   };
 }
 

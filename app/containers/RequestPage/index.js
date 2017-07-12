@@ -11,6 +11,7 @@ import Logger from 'js-logger';
 import MenuItem from 'material-ui/MenuItem';
 import AppBar from 'material-ui/AppBar';
 import Drawer from 'material-ui/Drawer';
+import TextField from 'material-ui/TextField';
 import IconButton from 'material-ui/IconButton';
 import prettyByte from 'pretty-byte';
 import prettyMs from 'pretty-ms';
@@ -23,7 +24,8 @@ import makeSelectRequestPage, {
   makeSelectRequest,
   selectErrorExecRequest,
   selectLoadingExecRequest,
-  selectRequestList, selectUser,
+  selectRequestList,
+  selectUser,
 } from './selectors';
 import messages from './messages';
 import RequestContainer from './RequestContainer';
@@ -32,15 +34,17 @@ import MethodField from './MethodField';
 import URLField from './URLField';
 import SendButton from './SendButton';
 import {
-  sendExecRequest,
-  sendExecRequestSuccess,
-  requestMethodChange,
-  requestUrlChange,
-  sendGetRequestList,
   cancelExecRequest,
   loadAuthToken,
+  openNewRequest,
+  requestBodyChange,
+  requestMethodChange,
+  requestUrlChange,
+  sendCopyRequest,
+  sendExecRequest,
+  sendExecRequestSuccess,
   sendGetRequest,
-  sendCopyRequest, openNewRequest,
+  sendGetRequestList,
 } from './actions';
 
 
@@ -100,6 +104,9 @@ export class RequestPage extends React.Component { // eslint-disable-line react/
               <li key={i}><b>{h.get('name')}</b>: {h.get('value')}</li>,
             )}
           </ul>
+          <div>
+            Body: {response.get('body')}
+          </div>
         </div>
       );
     }
@@ -168,6 +175,14 @@ export class RequestPage extends React.Component { // eslint-disable-line react/
 
             {submitButtonRender}
           </RequestContainer>
+          <TextField
+            hintText="Body"
+            floatingLabelText="Body"
+            onChange={this.props.onChangeBody}
+            multiLine
+            rows={2}
+            fullWidth
+          />
 
           {errorRender}
           {responseRender}
@@ -180,6 +195,7 @@ export class RequestPage extends React.Component { // eslint-disable-line react/
 RequestPage.propTypes = {
   onChangeMethod: PropTypes.func.isRequired,
   onChangeUrl: PropTypes.func.isRequired,
+  onChangeBody: PropTypes.func.isRequired,
   onSubmitForm: PropTypes.func.isRequired,
   cancelExecRequest: PropTypes.func.isRequired,
   sendRequestList: PropTypes.func.isRequired,
@@ -214,6 +230,7 @@ function mapDispatchToProps(dispatch) {
   return {
     onChangeMethod: (event, index, method) => dispatch(requestMethodChange(method)),
     onChangeUrl: (evt) => dispatch(requestUrlChange(evt.target.value)),
+    onChangeBody: (evt) => dispatch(requestBodyChange(evt.target.value)),
     onSubmitForm: (evt) => {
       if (evt !== undefined && evt.preventDefault) evt.preventDefault();
       dispatch(sendExecRequest());

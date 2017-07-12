@@ -8,20 +8,21 @@ import { fromJS } from 'immutable';
 import jwtDecode from 'jwt-decode';
 
 import {
-  SEND_EXEC_REQUEST,
-  SEND_EXEC_REQUEST_SUCCESS,
-  SEND_EXEC_REQUEST_ERROR,
+  NEW_REQUEST,
+  REQUEST_BODY_CHANGE,
   REQUEST_CREATE_SUCCESS,
-  SET_AUTH_TOKEN,
   REQUEST_METHOD_CHANGE,
   REQUEST_URL_CHANGE,
-  SEND_GET_REQUEST_LIST,
-  SEND_GET_REQUEST_LIST_SUCCESS,
-  SEND_GET_REQUEST_LIST_ERROR,
+  SEND_EXEC_REQUEST,
+  SEND_EXEC_REQUEST_ERROR,
+  SEND_EXEC_REQUEST_SUCCESS,
   SEND_GET_REQUEST,
   SEND_GET_REQUEST_ERROR,
+  SEND_GET_REQUEST_LIST,
+  SEND_GET_REQUEST_LIST_ERROR,
+  SEND_GET_REQUEST_LIST_SUCCESS,
   SEND_GET_REQUEST_SUCCESS,
-  NEW_REQUEST,
+  SET_AUTH_TOKEN,
 } from './actions';
 
 const initialRequest = fromJS({
@@ -30,6 +31,7 @@ const initialRequest = fromJS({
   data: {
     method: 'GET',
     url: '',
+    body: '',
   },
   status: {
     status: '',
@@ -103,6 +105,9 @@ function requestPageReducer(state = initialState, action) {
     case REQUEST_URL_CHANGE:
       return state
         .setIn(['request', 'data', 'url'], action.url);
+    case REQUEST_BODY_CHANGE:
+      return state
+        .setIn(['request', 'data', 'body'], action.body);
 
     case NEW_REQUEST:
       return state
