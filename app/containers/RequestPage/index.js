@@ -175,6 +175,23 @@ export class RequestPage extends React.Component { // eslint-disable-line react/
 
             {submitButtonRender}
           </RequestContainer>
+          Headers:
+          <ul>
+            {data.get('headers').map((h, i) =>
+              <div key={i}>
+                <TextField
+                  hintText="Name"
+                  floatingLabelText="Name"
+                  value={h.get('name')}
+                />
+                <TextField
+                  hintText="Value"
+                  floatingLabelText="Value"
+                  value={h.get('value')}
+                />
+              </div>,
+            )}
+          </ul>
           <TextField
             hintText="Body"
             floatingLabelText="Body"
