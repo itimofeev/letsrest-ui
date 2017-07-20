@@ -39,6 +39,11 @@ const selectUser = () => createSelector(
   (requestPageState) => requestPageState.get('user')
 );
 
+const selectNewRequestDialogOpen = () => createSelector(
+  selectRequestPageDomain(),
+  (requestPageState) => requestPageState.get('newRequestDialogOpen'),
+);
+
 const selectAuthToken = () => createSelector(
   selectRequestPageDomain(),
   (requestPageState) => requestPageState.get('authToken')
@@ -63,4 +68,5 @@ export {
   selectAuthToken,
   selectUser,
   selectErrorRequestList,
+  selectNewRequestDialogOpen,
 };

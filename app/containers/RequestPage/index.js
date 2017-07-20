@@ -12,7 +12,9 @@ import MenuItem from 'material-ui/MenuItem';
 import AppBar from 'material-ui/AppBar';
 import Drawer from 'material-ui/Drawer';
 import TextField from 'material-ui/TextField';
+import Dialog from 'material-ui/Dialog';
 import IconButton from 'material-ui/IconButton';
+import FlatButton from 'material-ui/FlatButton';
 import Snackbar from 'material-ui/Snackbar';
 import prettyByte from 'pretty-byte';
 import prettyMs from 'pretty-ms';
@@ -28,27 +30,30 @@ import makeSelectRequestPage, {
   selectErrorExecRequest,
   selectErrorRequestList,
   selectLoadingExecRequest,
+  selectNewRequestDialogOpen,
   selectRequestList,
   selectUser,
 } from './selectors';
 import messages from './messages';
 import RequestContainer from './RequestContainer';
-import Form from './Form';
+import PaddedContainer from './PaddedContainer';
 import MethodField from './MethodField';
 import URLField from './URLField';
 import SendButton from './SendButton';
 import {
   addHeader,
   cancelExecRequest,
+  closeNewRequestDialog,
   deleteHeader,
   headerNameChange,
   headerValueChange,
   loadAuthToken,
-  openNewRequest,
+  openNewRequestDialog,
   requestBodyChange,
   requestMethodChange,
   requestUrlChange,
   sendCopyRequest,
+  sendCreateRequest,
   sendDeleteRequest,
   sendExecRequest,
   sendExecRequestSuccess,
@@ -58,7 +63,6 @@ import {
 
 
 export class RequestPage extends React.Component { // eslint-disable-line react/prefer-stateless-function
-
   componentWillMount() {
     this.props.initAuthToken();
   }
@@ -79,6 +83,8 @@ export class RequestPage extends React.Component { // eslint-disable-line react/
     const loading = this.props.loadingExecRequest;
     const ownRequest = !this.props.user || !this.props.request.get('id') || this.props.user.get('id') === this.props.request.get('user_id');
     const editDisabled = loading || !ownRequest;
+
+    const renderRequestForm = request.get('id') !== '';
 
     let submitButtonRender = (<SendButton
       label={<FormattedMessage {...messages.send} />}
@@ -129,37 +135,10 @@ export class RequestPage extends React.Component { // eslint-disable-line react/
       );
     }
 
-    return (
-      <div>
-        <AppBar
-          title="Title"
-          iconClassNameRight="muidocs-icon-navigation-expand-more"
-        />
-        <Drawer open>
-          <AppBar
-            title="Title"
-            // iconElementLeft={<IconButton><NavigationClose /></IconButton>}
-            iconElementRight={<IconButton><ActionAutorenew /></IconButton>}
-            onRightIconButtonTouchTap={this.props.sendRequestList}
-            zDepth={0}
-          />
-
-          {this.props.requestList.map((h, i) =>
-            <MenuItem key={i} onClick={() => this.props.sendExecRequestSuccess(h)}>{h.get('name')}</MenuItem>,
-          )}
-        </Drawer>
-        <Helmet
-          title="RequestPage"
-          meta={[
-            { name: 'description', content: 'Description of RequestPage' },
-          ]}
-        />
-
-        <Form onSubmit={this.props.onSubmitForm}>
-          <SendButton
-            label={<FormattedMessage {...messages.newRequest} />}
-            onClick={this.props.openNewRequest}
-          />
+    let formRender = null;
+    if (renderRequestForm) {
+      formRender = (
+        <form onSubmit={this.props.onSubmitForm}>
           <SendButton
             label="DELETE"
             onClick={() => this.props.sendDeleteRequest(request.get('id'))}
@@ -221,7 +200,74 @@ export class RequestPage extends React.Component { // eslint-disable-line react/
 
           {errorRender}
           {responseRender}
-        </Form>
+        </form>
+      );
+    }
+
+    const newRequestDialogActions = [
+      <FlatButton
+        label="Cancel"
+        primary
+        onTouchTap={this.props.closeNewRequestDialog}
+      />,
+      <FlatButton
+        label="Submit"
+        primary
+        onTouchTap={() => this.props.sendCreateRequest(this.newRequestName.getValue())}
+      />,
+    ];
+
+    return (
+      <div>
+        <AppBar
+          title="Title"
+          iconClassNameRight="muidocs-icon-navigation-expand-more"
+        />
+        <Drawer open>
+          <AppBar
+            title="Title"
+            // iconElementLeft={<IconButton><NavigationClose /></IconButton>}
+            iconElementRight={<IconButton><ActionAutorenew /></IconButton>}
+            onRightIconButtonTouchTap={this.props.sendRequestList}
+            zDepth={0}
+          />
+
+          {this.props.requestList.map((h, i) =>
+            <MenuItem key={i} onClick={() => this.props.sendExecRequestSuccess(h)}>{h.get('name')}</MenuItem>,
+          )}
+        </Drawer>
+        <Helmet
+          title="RequestPage"
+          meta={[
+            { name: 'description', content: 'Description of RequestPage' },
+          ]}
+        />
+
+        <PaddedContainer>
+          <SendButton
+            label={<FormattedMessage {...messages.newRequest} />}
+            onTouchTap={this.props.openNewRequestDialog}
+          />
+
+          {formRender}
+
+        </PaddedContainer>
+
+        <Dialog
+          title="Create new request"
+          modal
+          actions={newRequestDialogActions}
+          open={this.props.newRequestDialogOpen}
+        >
+          Set name for new request:
+          <TextField
+            hintText="Name"
+            floatingLabelText="Name"
+            // eslint-disable-next-line no-return-assign
+            ref={(input) => this.newRequestName = input}
+          />
+        </Dialog>
+
         <Snackbar
           open={this.props.errorRequestList !== false}
           message={this.props.errorRequestList}
@@ -244,7 +290,10 @@ RequestPage.propTypes = {
   sendGetRequest: PropTypes.func.isRequired,
   initAuthToken: PropTypes.func.isRequired,
   sendCopyRequest: PropTypes.func.isRequired,
-  openNewRequest: PropTypes.func.isRequired,
+  openNewRequestDialog: PropTypes.func.isRequired,
+  closeNewRequestDialog: PropTypes.func.isRequired,
+  newRequestDialogOpen: PropTypes.bool.isRequired,
+  sendCreateRequest: PropTypes.func.isRequired,
   addHeader: PropTypes.func.isRequired,
   deleteHeader: PropTypes.func.isRequired,
   sendExecRequestSuccess: PropTypes.func.isRequired,
@@ -273,6 +322,7 @@ const mapStateToProps = createStructuredSelector({
   requestList: selectRequestList(),
   user: selectUser(),
   errorRequestList: selectErrorRequestList(),
+  newRequestDialogOpen: selectNewRequestDialogOpen(),
 });
 
 function mapDispatchToProps(dispatch) {
@@ -288,6 +338,7 @@ function mapDispatchToProps(dispatch) {
     },
     sendRequestList: (requestId) => dispatch(sendGetRequestList(requestId)),
     sendDeleteRequest: (requestId) => dispatch(sendDeleteRequest(requestId)),
+    sendCreateRequest: (name) => dispatch(sendCreateRequest(name)),
     cancelExecRequest: () => dispatch(cancelExecRequest()),
     initAuthToken: () => dispatch(loadAuthToken()),
     sendExecRequestSuccess: (req) => {
@@ -298,10 +349,8 @@ function mapDispatchToProps(dispatch) {
     sendCopyRequest: () => dispatch(sendCopyRequest()),
     addHeader: () => dispatch(addHeader()),
     deleteHeader: (i) => dispatch(deleteHeader(i)),
-    openNewRequest: () => {
-      dispatch(openNewRequest());
-      dispatch(push('/request'));
-    },
+    openNewRequestDialog: () => dispatch(openNewRequestDialog()),
+    closeNewRequestDialog: () => dispatch(closeNewRequestDialog()),
   };
 }
 

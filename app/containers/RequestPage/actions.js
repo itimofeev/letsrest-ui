@@ -8,7 +8,9 @@ export const SEND_EXEC_REQUEST = 'app/RequestPage/SEND_EXEC_REQUEST';
 export const SEND_EXEC_REQUEST_SUCCESS = 'app/RequestPage/SEND_EXEC_REQUEST_SUCCESS';
 export const SEND_EXEC_REQUEST_ERROR = 'app/RequestPage/SEND_EXEC_REQUEST_ERROR';
 
-export const REQUEST_CREATE_SUCCESS = 'app/RequestPage/REQUEST_CREATE_SUCCESS';
+export const SEND_CREATE_REQUEST = 'app/RequestPage/SEND_CREATE_REQUEST';
+export const SEND_CREATE_REQUEST_SUCCESS = 'app/RequestPage/SEND_CREATE_REQUEST_SUCCESS';
+
 export const CANCEL_EXEC_REQUEST = 'app/RequestPage/CANCEL_EXEC_REQUEST';
 
 export const SEND_GET_REQUEST_LIST = 'app/RequestPage/SEND_GET_REQUEST_LIST';
@@ -36,7 +38,7 @@ export const HEADER_VALUE_CHANGE = 'app/RequestPage/HEADER_VALUE_CHANGE';
 export const LOAD_AUTH_TOKEN = 'app/App/LOAD_AUTH_TOKEN';
 export const SET_AUTH_TOKEN = 'app/App/SET_AUTH_TOKEN';
 
-export const NEW_REQUEST = 'app/App/NEW_REQUEST';
+export const NEW_REQUEST_DIALOG = 'app/App/NEW_REQUEST_DIALOG';
 
 export function loadAuthToken() {
   return {
@@ -48,13 +50,6 @@ export function setAuthToken(authToken) {
   return {
     type: SET_AUTH_TOKEN,
     authToken,
-  };
-}
-
-export function requestCreateSuccess(request) {
-  return {
-    type: REQUEST_CREATE_SUCCESS,
-    request,
   };
 }
 
@@ -75,6 +70,20 @@ export function sendExecRequestError(error) {
   return {
     type: SEND_EXEC_REQUEST_ERROR,
     error,
+  };
+}
+
+export function sendCreateRequest(name) {
+  return {
+    type: SEND_CREATE_REQUEST,
+    name,
+  };
+}
+
+export function sendCreateRequestSuccess(request) {
+  return {
+    type: SEND_CREATE_REQUEST_SUCCESS,
+    request,
   };
 }
 
@@ -202,9 +211,18 @@ export function sendDeleteRequestError(error) {
   };
 }
 
-export function openNewRequest() {
+export function openNewRequestDialog() {
   return {
-    type: NEW_REQUEST,
+    type: NEW_REQUEST_DIALOG,
+    open: true,
+  };
+}
+
+
+export function closeNewRequestDialog() {
+  return {
+    type: NEW_REQUEST_DIALOG,
+    open: false,
   };
 }
 

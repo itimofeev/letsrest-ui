@@ -12,11 +12,11 @@ import {
   DELETE_HEADER,
   HEADER_NAME_CHANGE,
   HEADER_VALUE_CHANGE,
-  NEW_REQUEST,
+  NEW_REQUEST_DIALOG,
   REQUEST_BODY_CHANGE,
-  REQUEST_CREATE_SUCCESS,
   REQUEST_METHOD_CHANGE,
   REQUEST_URL_CHANGE,
+  SEND_CREATE_REQUEST_SUCCESS,
   SEND_DELETE_REQUEST,
   SEND_DELETE_REQUEST_ERROR,
   SEND_DELETE_REQUEST_SUCCESS,
@@ -32,7 +32,7 @@ import {
   SET_AUTH_TOKEN,
 } from './actions';
 
-const initialRequest = fromJS({
+export const initialRequest = fromJS({
   id: '',
   name: '',
   data: {
@@ -58,6 +58,8 @@ const initialState = fromJS({
 
   errorRequestList: false,
   loadingRequestList: false,
+
+  newRequestDialogOpen: false,
 });
 
 function requestPageReducer(state = initialState, action) {
@@ -72,9 +74,9 @@ function requestPageReducer(state = initialState, action) {
         .set('loadingExecRequest', false);
     case SEND_EXEC_REQUEST_SUCCESS:
       return setRequest(state, action.request);
-    case REQUEST_CREATE_SUCCESS:
-      return state
-        .set('request', action.request);
+    case SEND_CREATE_REQUEST_SUCCESS:
+      return setRequest(state, action.request)
+        .set('newRequestDialogOpen', false);
 
     case SET_AUTH_TOKEN:
       return state.set('authToken', action.authToken)
@@ -141,9 +143,9 @@ function requestPageReducer(state = initialState, action) {
       return state
         .setIn(['request', 'data', 'headers', action.index, 'value'], action.value);
 
-    case NEW_REQUEST:
+    case NEW_REQUEST_DIALOG:
       return state
-        .set('request', initialRequest);
+        .set('newRequestDialogOpen', action.open);
 
     default:
       return state;

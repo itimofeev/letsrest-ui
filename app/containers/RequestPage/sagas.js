@@ -8,12 +8,13 @@ import { getAuthTokenOrNull, storeAuthToken } from '../../utils/localStorageHelp
 import {
   CANCEL_EXEC_REQUEST,
   LOAD_AUTH_TOKEN,
-  requestCreateSuccess,
   SEND_COPY_REQUEST,
+  SEND_CREATE_REQUEST,
   SEND_DELETE_REQUEST,
   SEND_EXEC_REQUEST,
   SEND_GET_REQUEST,
   SEND_GET_REQUEST_LIST,
+  sendCreateRequestSuccess,
   sendDeleteRequestError,
   sendDeleteRequestSuccess,
   sendExecRequestError,
@@ -26,13 +27,10 @@ import {
 } from './actions';
 import { makeSelectRequest, selectAuthToken } from './selectors';
 
-function* sendCreateRequest() {
+function* sendCreateRequest(action) {
   yield call(loadAuthToken);
 
   const authToken = yield select(selectAuthToken());
-  const req = yield select(makeSelectRequest());
-  const data = req.get('data');
-
   const requestURL = '/api/v1/requests';
 
   const options = {
@@ -43,26 +41,21 @@ function* sendCreateRequest() {
       Authorization: `Bearer ${authToken}`,
     },
     body: JSON.stringify({
-      name: `${data.get('method')} ${data.get('url')}`,
+      name: action.name,
     }),
   };
 
-  return yield call(request, requestURL, options);
+  try {
+    const req = yield call(request, requestURL, options);
+    yield put(sendCreateRequestSuccess(fromJS(req)));
+    yield put(push(`/request/${req.id}`));
+  } catch (err) {
+    yield put(sendExecRequestError(err));
+  }
 }
 
 export function* sendExecRequest() {
-  let req = yield select(makeSelectRequest());
-  if (!req.get('id')) {
-    try {
-      const created = yield call(sendCreateRequest);
-      req = req.set('id', created.id);
-      yield put(requestCreateSuccess(fromJS(req)));
-      // yield put(sendGetRequestList());
-    } catch (err) {
-      yield put(sendExecRequestError(err));
-      return;
-    }
-  }
+  const req = yield select(makeSelectRequest());
 
   const authToken = yield select(selectAuthToken());
   const requestURL = `/api/v1/requests/${req.get('id')}`;
@@ -267,6 +260,13 @@ export function* sendExecRequestData() {
   yield cancel(watcher);
 }
 
+
+export function* sendCreateRequestData() {
+  const watcher = yield takeLatest(SEND_CREATE_REQUEST, sendCreateRequest);
+  yield take(LOCATION_CHANGE);
+  yield cancel(watcher);
+}
+
 export function* sendGetRequestListData() {
   const watcher = yield takeLatest(SEND_GET_REQUEST_LIST, sendRequestList);
   yield take(LOCATION_CHANGE);
@@ -305,4 +305,5 @@ export default [
   loadAuthTokenData,
   sendCopyRequestData,
   sendDeleteRequestData,
+  sendCreateRequestData,
 ];
