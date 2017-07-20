@@ -11,19 +11,23 @@ import Logger from 'js-logger';
 import MenuItem from 'material-ui/MenuItem';
 import AppBar from 'material-ui/AppBar';
 import Drawer from 'material-ui/Drawer';
+import TextField from 'material-ui/TextField';
 import IconButton from 'material-ui/IconButton';
 import prettyByte from 'pretty-byte';
 import prettyMs from 'pretty-ms';
 import { push } from 'react-router-redux';
 // import NavigationClose from 'material-ui/svg-icons/navigation/close';
 import ActionAutorenew from 'material-ui/svg-icons/action/autorenew';
+import RemoveIcon from 'material-ui/svg-icons/action/delete';
+import AddIcon from 'material-ui/svg-icons/content/add';
 import { FormattedMessage } from 'react-intl';
 import { createStructuredSelector } from 'reselect';
 import makeSelectRequestPage, {
   makeSelectRequest,
   selectErrorExecRequest,
   selectLoadingExecRequest,
-  selectRequestList, selectUser,
+  selectRequestList,
+  selectUser,
 } from './selectors';
 import messages from './messages';
 import RequestContainer from './RequestContainer';
@@ -32,15 +36,21 @@ import MethodField from './MethodField';
 import URLField from './URLField';
 import SendButton from './SendButton';
 import {
-  sendExecRequest,
-  sendExecRequestSuccess,
+  addHeader,
+  cancelExecRequest,
+  deleteHeader,
+  headerNameChange,
+  headerValueChange,
+  loadAuthToken,
+  openNewRequest,
+  requestBodyChange,
   requestMethodChange,
   requestUrlChange,
-  sendGetRequestList,
-  cancelExecRequest,
-  loadAuthToken,
+  sendCopyRequest,
+  sendExecRequest,
+  sendExecRequestSuccess,
   sendGetRequest,
-  sendCopyRequest, openNewRequest,
+  sendGetRequestList,
 } from './actions';
 
 
@@ -100,6 +110,9 @@ export class RequestPage extends React.Component { // eslint-disable-line react/
               <li key={i}><b>{h.get('name')}</b>: {h.get('value')}</li>,
             )}
           </ul>
+          <div>
+            Body: {response.get('body')}
+          </div>
         </div>
       );
     }
@@ -150,7 +163,7 @@ export class RequestPage extends React.Component { // eslint-disable-line react/
               floatingLabelText="Method"
               value={data.get('method')}
               disabled={editDisabled}
-              onChange={this.props.onChangeMethod}
+              onChange={(event, index, method) => this.props.onChangeMethod(method)}
             >
               <MenuItem value={'GET'} primaryText="GET" />
               <MenuItem value={'POST'} primaryText="POST" />
@@ -162,12 +175,41 @@ export class RequestPage extends React.Component { // eslint-disable-line react/
               hintText="URL"
               floatingLabelText="URL"
               disabled={editDisabled}
-              onChange={this.props.onChangeUrl}
+              onChange={(evt) => this.props.onChangeUrl(evt.target.value)}
               value={data.get('url')}
             />
 
             {submitButtonRender}
           </RequestContainer>
+          Headers:
+          <ul>
+            {data.get('headers').map((h, i) =>
+              <div key={i}>
+                <TextField
+                  hintText="Name"
+                  floatingLabelText="Name"
+                  value={h.get('name')}
+                  onChange={(evt) => this.props.onHeaderNameChange(i, evt.target.value)}
+                />
+                <TextField
+                  hintText="Value"
+                  floatingLabelText="Value"
+                  value={h.get('value')}
+                  onChange={(evt) => this.props.onHeaderValueChange(i, evt.target.value)}
+                />
+                <IconButton onClick={() => this.props.deleteHeader(i)}><RemoveIcon /></IconButton>
+              </div>,
+            )}
+          </ul>
+          <IconButton onClick={this.props.addHeader}><AddIcon /></IconButton>
+          <TextField
+            hintText="Body"
+            floatingLabelText="Body"
+            onChange={(evt) => this.props.onChangeBody(evt.target.value)}
+            multiLine
+            rows={2}
+            fullWidth
+          />
 
           {errorRender}
           {responseRender}
@@ -180,6 +222,9 @@ export class RequestPage extends React.Component { // eslint-disable-line react/
 RequestPage.propTypes = {
   onChangeMethod: PropTypes.func.isRequired,
   onChangeUrl: PropTypes.func.isRequired,
+  onChangeBody: PropTypes.func.isRequired,
+  onHeaderNameChange: PropTypes.func.isRequired,
+  onHeaderValueChange: PropTypes.func.isRequired,
   onSubmitForm: PropTypes.func.isRequired,
   cancelExecRequest: PropTypes.func.isRequired,
   sendRequestList: PropTypes.func.isRequired,
@@ -187,6 +232,8 @@ RequestPage.propTypes = {
   initAuthToken: PropTypes.func.isRequired,
   sendCopyRequest: PropTypes.func.isRequired,
   openNewRequest: PropTypes.func.isRequired,
+  addHeader: PropTypes.func.isRequired,
+  deleteHeader: PropTypes.func.isRequired,
   sendExecRequestSuccess: PropTypes.func.isRequired,
   request: PropTypes.object.isRequired,
   requestList: PropTypes.object.isRequired,
@@ -213,7 +260,10 @@ const mapStateToProps = createStructuredSelector({
 function mapDispatchToProps(dispatch) {
   return {
     onChangeMethod: (event, index, method) => dispatch(requestMethodChange(method)),
-    onChangeUrl: (evt) => dispatch(requestUrlChange(evt.target.value)),
+    onChangeUrl: (value) => dispatch(requestUrlChange(value)),
+    onChangeBody: (value) => dispatch(requestBodyChange(value)),
+    onHeaderNameChange: (i, value) => dispatch(headerNameChange(i, value)),
+    onHeaderValueChange: (i, value) => dispatch(headerValueChange(i, value)),
     onSubmitForm: (evt) => {
       if (evt !== undefined && evt.preventDefault) evt.preventDefault();
       dispatch(sendExecRequest());
@@ -227,6 +277,8 @@ function mapDispatchToProps(dispatch) {
     },
     sendGetRequest: (req) => dispatch(sendGetRequest(req)),
     sendCopyRequest: () => dispatch(sendCopyRequest()),
+    addHeader: () => dispatch(addHeader()),
+    deleteHeader: (i) => dispatch(deleteHeader(i)),
     openNewRequest: () => {
       dispatch(openNewRequest());
       dispatch(push('/request'));

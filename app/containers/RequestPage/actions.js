@@ -23,6 +23,11 @@ export const SEND_GET_REQUEST_ERROR = 'app/RequestPage/SEND_GET_REQUEST_ERROR';
 
 export const REQUEST_METHOD_CHANGE = 'app/RequestPage/REQUEST_METHOD_CHANGE';
 export const REQUEST_URL_CHANGE = 'app/RequestPage/REQUEST_URL_CHANGE';
+export const REQUEST_BODY_CHANGE = 'app/RequestPage/REQUEST_BODY_CHANGE';
+export const DELETE_HEADER = 'app/RequestPage/DELETE_HEADER';
+export const ADD_HEADER = 'app/RequestPage/ADD_HEADER';
+export const HEADER_NAME_CHANGE = 'app/RequestPage/HEADER_NAME_CHANGE';
+export const HEADER_VALUE_CHANGE = 'app/RequestPage/HEADER_VALUE_CHANGE';
 
 export const LOAD_AUTH_TOKEN = 'app/App/LOAD_AUTH_TOKEN';
 export const SET_AUTH_TOKEN = 'app/App/SET_AUTH_TOKEN';
@@ -34,6 +39,7 @@ export function loadAuthToken() {
     type: LOAD_AUTH_TOKEN,
   };
 }
+
 export function setAuthToken(authToken) {
   return {
     type: SET_AUTH_TOKEN,
@@ -115,7 +121,6 @@ export function sendGetRequestError(error) {
   };
 }
 
-
 export function sendCopyRequest() {
   return {
     type: SEND_COPY_REQUEST,
@@ -133,6 +138,42 @@ export function requestUrlChange(url) {
   return {
     type: REQUEST_URL_CHANGE,
     url,
+  };
+}
+
+export function requestBodyChange(body) {
+  return {
+    type: REQUEST_BODY_CHANGE,
+    body,
+  };
+}
+
+export function deleteHeader(index) {
+  return {
+    type: DELETE_HEADER,
+    index,
+  };
+}
+
+export function addHeader() {
+  return {
+    type: ADD_HEADER,
+  };
+}
+
+export function headerNameChange(index, value) {
+  return {
+    type: HEADER_NAME_CHANGE,
+    index,
+    value,
+  };
+}
+
+export function headerValueChange(index, value) {
+  return {
+    type: HEADER_VALUE_CHANGE,
+    index,
+    value,
   };
 }
 
