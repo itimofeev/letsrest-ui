@@ -34,10 +34,7 @@ const initialRequest = fromJS({
   name: '',
   data: {
     method: 'GET',
-    headers: [{ name: 'Content-Type', value: 'application/json' }, {
-      name: 'Authorization',
-      value: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySUQiOjEsIlVzZXJOYW1lIjoiaWx5YS51Zm9AZ21haWwuY29tIiwiZXhwIjoxNDk5OTc4NjQ3LCJpYXQiOjE0OTk4OTIyNDcsImlzcyI6IkF4eG9uQ2xvdWQifQ.0RExlPmUbxux-uN4xvhXC57z5POklekJtg5WuPlXCKU',
-    }],
+    headers: [],
     url: '',
     body: '',
   },
