@@ -12,24 +12,24 @@ import {
   DELETE_HEADER,
   HEADER_NAME_CHANGE,
   HEADER_VALUE_CHANGE,
-  NEW_REQUEST,
+  NEW_REQUEST_DIALOG,
   REQUEST_BODY_CHANGE,
-  REQUEST_CREATE_SUCCESS,
   REQUEST_METHOD_CHANGE,
   REQUEST_URL_CHANGE,
+  SEND_CREATE_REQUEST_SUCCESS,
+  SEND_DELETE_REQUEST,
+  SEND_DELETE_REQUEST_SUCCESS,
+  SEND_ERROR,
   SEND_EXEC_REQUEST,
-  SEND_EXEC_REQUEST_ERROR,
   SEND_EXEC_REQUEST_SUCCESS,
   SEND_GET_REQUEST,
-  SEND_GET_REQUEST_ERROR,
   SEND_GET_REQUEST_LIST,
-  SEND_GET_REQUEST_LIST_ERROR,
   SEND_GET_REQUEST_LIST_SUCCESS,
   SEND_GET_REQUEST_SUCCESS,
   SET_AUTH_TOKEN,
 } from './actions';
 
-const initialRequest = fromJS({
+export const initialRequest = fromJS({
   id: '',
   name: '',
   data: {
@@ -49,29 +49,33 @@ const initialState = fromJS({
   request: initialRequest,
   authToken: '',
   requestList: [],
-  errorExecRequest: false,
+  errorSend: false,
   loadingExecRequest: false,
   user: false,
-
-  errorRequestList: false,
   loadingRequestList: false,
+
+  newRequestDialogOpen: false,
+  newRequestDialogName: '',
 });
 
 function requestPageReducer(state = initialState, action) {
   switch (action.type) {
     case SEND_EXEC_REQUEST:
       return state
-        .set('errorExecRequest', false)
+        .set('errorSend', false)
         .set('loadingExecRequest', true);
-    case SEND_EXEC_REQUEST_ERROR:
+    case SEND_ERROR:
       return state
-        .set('errorExecRequest', action.error)
+        .set('errorSend', action.error)
+        .set('newRequestDialogOpen', false)
+        .set('loadingRequestList', false)
         .set('loadingExecRequest', false);
     case SEND_EXEC_REQUEST_SUCCESS:
-      return setRequest(state, action.request);
-    case REQUEST_CREATE_SUCCESS:
-      return state
-        .set('request', action.request);
+      return setRequest(state, action.request)
+        .set('newRequestDialogOpen', false);
+    case SEND_CREATE_REQUEST_SUCCESS:
+      return setRequest(state, action.request)
+        .set('newRequestDialogOpen', false);
 
     case SET_AUTH_TOKEN:
       return state.set('authToken', action.authToken)
@@ -79,30 +83,28 @@ function requestPageReducer(state = initialState, action) {
 
     case SEND_GET_REQUEST:
       return state
-        .set('errorExecRequest', false)
+        .set('errorSend', false)
         .set('loadingExecRequest', true);
-    case SEND_GET_REQUEST_ERROR:
-      return state
-        .set('errorExecRequest', action.error)
-        .set('loadingExecRequest', false);
     case SEND_GET_REQUEST_SUCCESS:
       return state
         .set('request', action.request)
-        .set('errorExecRequest', false)
+        .set('errorSend', false)
         .set('loadingExecRequest', false);
 
     case SEND_GET_REQUEST_LIST:
       return state
-        .set('errorRequestList', false)
+        .set('errorSend', false)
         .set('loadingRequestList', true);
-    case SEND_GET_REQUEST_LIST_ERROR:
-      return state
-        .set('errorRequestList', action.error)
-        .set('loadingRequestList', false);
     case SEND_GET_REQUEST_LIST_SUCCESS:
       return state
         .set('requestList', action.requestList)
         .set('loadingRequestList', false);
+
+    case SEND_DELETE_REQUEST:
+      return state
+        .set('errorSend', false);
+    case SEND_DELETE_REQUEST_SUCCESS:
+      return deleteRequest(state, action.requestId);
 
     case REQUEST_METHOD_CHANGE:
       return state
@@ -129,9 +131,10 @@ function requestPageReducer(state = initialState, action) {
       return state
         .setIn(['request', 'data', 'headers', action.index, 'value'], action.value);
 
-    case NEW_REQUEST:
+    case NEW_REQUEST_DIALOG:
       return state
-        .set('request', initialRequest);
+        .set('newRequestDialogOpen', action.open)
+        .set('newRequestDialogName', action.name);
 
     default:
       return state;
@@ -141,7 +144,7 @@ function requestPageReducer(state = initialState, action) {
 function setRequest(state, request) {
   const newState = state
     .set('request', request)
-    .set('errorExecRequest', false)
+    .set('errorSend', false)
     .set('loadingExecRequest', false);
 
   const requestIndex = state.get('requestList').findIndex((item) => item.get('id') === request.get('id'));
@@ -150,6 +153,15 @@ function setRequest(state, request) {
     return newState.update('requestList', (requestList) => requestList.push(request));
   }
   return newState.setIn(['requestList', requestIndex], request);
+}
+
+function deleteRequest(state, id) {
+  const requestIndex = state.get('requestList').findIndex((item) => item.get('id') === id);
+  if (requestIndex === -1) {
+    return state;
+  }
+
+  return state.deleteIn(['requestList', requestIndex]).set('request', initialRequest);
 }
 
 export default requestPageReducer;

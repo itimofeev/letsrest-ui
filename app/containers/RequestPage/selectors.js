@@ -14,11 +14,6 @@ const makeSelectRequest = () => createSelector(
   (requestPageState) => requestPageState.get('request')
 );
 
-const selectErrorExecRequest = () => createSelector(
-  selectRequestPageDomain(),
-  (requestPageState) => requestPageState.get('errorExecRequest')
-);
-
 const selectLoadingExecRequest = () => createSelector(
   selectRequestPageDomain(),
   (requestPageState) => requestPageState.get('loadingExecRequest')
@@ -29,9 +24,24 @@ const selectRequestList = () => createSelector(
   (requestPageState) => requestPageState.get('requestList')
 );
 
+const selectErrorSend = () => createSelector(
+  selectRequestPageDomain(),
+  (requestPageState) => requestPageState.get('errorSend'),
+);
+
 const selectUser = () => createSelector(
   selectRequestPageDomain(),
   (requestPageState) => requestPageState.get('user')
+);
+
+const selectNewRequestDialogOpen = () => createSelector(
+  selectRequestPageDomain(),
+  (requestPageState) => requestPageState.get('newRequestDialogOpen'),
+);
+
+const selectNewRequestDialogName = () => createSelector(
+  selectRequestPageDomain(),
+  (requestPageState) => requestPageState.get('newRequestDialogName'),
 );
 
 const selectAuthToken = () => createSelector(
@@ -52,9 +62,11 @@ export default makeSelectRequestPage;
 export {
   selectRequestPageDomain,
   makeSelectRequest,
-  selectErrorExecRequest,
+  selectErrorSend,
   selectLoadingExecRequest,
   selectRequestList,
   selectAuthToken,
   selectUser,
+  selectNewRequestDialogOpen,
+  selectNewRequestDialogName,
 };

@@ -2,34 +2,33 @@ import { fromJS } from 'immutable';
 import Logger from 'js-logger';
 import { LOCATION_CHANGE, push } from 'react-router-redux';
 import { delay } from 'redux-saga';
-import { cancel, cancelled, fork, put, call, take, select, takeLatest } from 'redux-saga/effects';
+import { call, cancel, cancelled, fork, put, select, take, takeLatest } from 'redux-saga/effects';
 import request from 'utils/request';
 import { getAuthTokenOrNull, storeAuthToken } from '../../utils/localStorageHelper';
 import {
-  SEND_EXEC_REQUEST,
-  SEND_GET_REQUEST_LIST,
   CANCEL_EXEC_REQUEST,
   LOAD_AUTH_TOKEN,
-  SEND_GET_REQUEST,
   SEND_COPY_REQUEST,
-  setAuthToken,
+  SEND_CREATE_REQUEST,
+  SEND_DELETE_REQUEST,
+  SEND_EDIT_REQUEST,
+  SEND_EXEC_REQUEST,
+  SEND_GET_REQUEST,
+  SEND_GET_REQUEST_LIST,
+  sendCreateRequestSuccess,
+  sendDeleteRequestSuccess,
+  sendError,
   sendExecRequestSuccess,
-  sendExecRequestError,
   sendGetRequestListSuccess,
-  sendGetRequestListError,
-  requestCreateSuccess,
   sendGetRequestSuccess,
-  sendGetRequestError,
+  setAuthToken,
 } from './actions';
 import { makeSelectRequest, selectAuthToken } from './selectors';
 
-function* sendCreateRequest() {
+function* sendCreateRequest(action) {
   yield call(loadAuthToken);
 
   const authToken = yield select(selectAuthToken());
-  const req = yield select(makeSelectRequest());
-  const data = req.get('data');
-
   const requestURL = '/api/v1/requests';
 
   const options = {
@@ -40,26 +39,21 @@ function* sendCreateRequest() {
       Authorization: `Bearer ${authToken}`,
     },
     body: JSON.stringify({
-      name: `${data.get('method')} ${data.get('url')}`,
+      name: action.name,
     }),
   };
 
-  return yield call(request, requestURL, options);
+  try {
+    const req = yield call(request, requestURL, options);
+    yield put(sendCreateRequestSuccess(fromJS(req)));
+    yield put(push(`/request/${req.id}`));
+  } catch (err) {
+    yield put(sendError(err));
+  }
 }
 
 export function* sendExecRequest() {
-  let req = yield select(makeSelectRequest());
-  if (!req.get('id')) {
-    try {
-      const created = yield call(sendCreateRequest);
-      req = req.set('id', created.id);
-      yield put(requestCreateSuccess(fromJS(req)));
-      // yield put(sendGetRequestList());
-    } catch (err) {
-      yield put(sendExecRequestError(err));
-      return;
-    }
-  }
+  const req = yield select(makeSelectRequest());
 
   const authToken = yield select(selectAuthToken());
   const requestURL = `/api/v1/requests/${req.get('id')}`;
@@ -78,7 +72,7 @@ export function* sendExecRequest() {
     yield call(request, requestURL, options);
     yield call(tryLoadResponseUntilDone);
   } catch (err) {
-    yield put(sendExecRequestError(err));
+    yield put(sendError(err));
   }
 }
 
@@ -110,14 +104,14 @@ function* loadRequestUntilDone() {
       try {
         loadedReq = yield call(request, requestURL, options);
       } catch (err) {
-        yield put(sendExecRequestError(err));
+        yield put(sendError(err));
         break;
       }
 
       if (loadedReq.status.status === 'in_progress') {
         yield call(delay, 1000);
       } else if (loadedReq.status.status === 'error') {
-        yield put(sendExecRequestError('error from server'));
+        yield put(sendError('error from server'));
         return;
       } else {
         yield put(sendExecRequestSuccess(fromJS(loadedReq)));
@@ -125,10 +119,10 @@ function* loadRequestUntilDone() {
         return;
       }
     }
-    yield put(sendExecRequestError('Waiting response timeout'));
+    yield put(sendError('Waiting response timeout'));
   } finally {
     if (yield cancelled()) {
-      yield put(sendExecRequestError('Task cancelled'));
+      yield put(sendError('Task cancelled'));
     }
   }
 }
@@ -153,7 +147,7 @@ export function* sendRequestList() {
     const requestList = fromJS(json);
     yield put(sendGetRequestListSuccess(requestList));
   } catch (err) {
-    yield put(sendGetRequestListError(err));
+    yield put(sendError(err));
   }
 }
 
@@ -177,7 +171,31 @@ export function* sendGetRequest(action) {
     const requestJson = fromJS(json);
     yield put(sendGetRequestSuccess(requestJson));
   } catch (err) {
-    yield put(sendGetRequestError(err));
+    yield put(sendError(err));
+  }
+}
+
+export function* sendDeleteRequest(action) {
+  yield call(loadAuthToken);
+
+  const authToken = yield select(selectAuthToken());
+  const requestURL = `/api/v1/requests/${action.requestId}`;
+  const method = 'DELETE';
+  const options = {
+    method,
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${authToken}`,
+    },
+  };
+
+  try {
+    yield call(request, requestURL, options);
+    yield put(push('/request'));
+    yield put(sendDeleteRequestSuccess(action.requestId));
+  } catch (err) {
+    yield put(sendError(err));
   }
 }
 
@@ -204,7 +222,34 @@ export function* sendCopyRequest() {
     yield put(sendExecRequestSuccess(requestJson));
     yield put(push(`/request/${requestJson.get('id')}`));
   } catch (err) {
-    yield put(sendExecRequestError(err));
+    yield put(sendError(err));
+  }
+}
+
+export function* sendEditRequest(action) {
+  yield call(loadAuthToken);
+
+  const authToken = yield select(selectAuthToken());
+  const req = yield select(makeSelectRequest());
+
+  const requestURL = `/api/v1/requests/${req.get('id')}`;
+  const method = 'PATCH';
+  const options = {
+    method,
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${authToken}`,
+    },
+    body: JSON.stringify({ name: action.name }),
+  };
+
+  try {
+    const json = yield call(request, requestURL, options);
+    const requestJson = fromJS(json);
+    yield put(sendExecRequestSuccess(requestJson));
+  } catch (err) {
+    yield put(sendError(err.toString()));
   }
 }
 
@@ -240,6 +285,13 @@ export function* sendExecRequestData() {
   yield cancel(watcher);
 }
 
+
+export function* sendCreateRequestData() {
+  const watcher = yield takeLatest(SEND_CREATE_REQUEST, sendCreateRequest);
+  yield take(LOCATION_CHANGE);
+  yield cancel(watcher);
+}
+
 export function* sendGetRequestListData() {
   const watcher = yield takeLatest(SEND_GET_REQUEST_LIST, sendRequestList);
   yield take(LOCATION_CHANGE);
@@ -252,8 +304,20 @@ export function* sendGetRequestData() {
   yield cancel(watcher);
 }
 
+export function* sendDeleteRequestData() {
+  const watcher = yield takeLatest(SEND_DELETE_REQUEST, sendDeleteRequest);
+  yield take(LOCATION_CHANGE);
+  yield cancel(watcher);
+}
+
 export function* sendCopyRequestData() {
   const watcher = yield takeLatest(SEND_COPY_REQUEST, sendCopyRequest);
+  yield take(LOCATION_CHANGE);
+  yield cancel(watcher);
+}
+
+export function* sendEditRequestData() {
+  const watcher = yield takeLatest(SEND_EDIT_REQUEST, sendEditRequest);
   yield take(LOCATION_CHANGE);
   yield cancel(watcher);
 }
@@ -271,4 +335,7 @@ export default [
   sendGetRequestData,
   loadAuthTokenData,
   sendCopyRequestData,
+  sendDeleteRequestData,
+  sendCreateRequestData,
+  sendEditRequestData,
 ];

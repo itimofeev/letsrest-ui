@@ -6,20 +6,26 @@
 
 export const SEND_EXEC_REQUEST = 'app/RequestPage/SEND_EXEC_REQUEST';
 export const SEND_EXEC_REQUEST_SUCCESS = 'app/RequestPage/SEND_EXEC_REQUEST_SUCCESS';
-export const SEND_EXEC_REQUEST_ERROR = 'app/RequestPage/SEND_EXEC_REQUEST_ERROR';
 
-export const REQUEST_CREATE_SUCCESS = 'app/RequestPage/REQUEST_CREATE_SUCCESS';
+export const SEND_CREATE_REQUEST = 'app/RequestPage/SEND_CREATE_REQUEST';
+export const SEND_CREATE_REQUEST_SUCCESS = 'app/RequestPage/SEND_CREATE_REQUEST_SUCCESS';
+
+export const SEND_EDIT_REQUEST = 'app/RequestPage/SEND_EDIT_REQUEST';
+export const SEND_EDIT_REQUEST_SUCCESS = 'app/RequestPage/SEND_EDIT_REQUEST_SUCCESS';
+
 export const CANCEL_EXEC_REQUEST = 'app/RequestPage/CANCEL_EXEC_REQUEST';
 
 export const SEND_GET_REQUEST_LIST = 'app/RequestPage/SEND_GET_REQUEST_LIST';
 export const SEND_GET_REQUEST_LIST_SUCCESS = 'app/RequestPage/SEND_GET_REQUEST_LIST_SUCCESS';
-export const SEND_GET_REQUEST_LIST_ERROR = 'app/RequestPage/SEND_GET_REQUEST_LIST_ERROR';
+export const SEND_ERROR = 'app/RequestPage/SEND_ERROR';
 
 export const SEND_COPY_REQUEST = 'app/RequestPage/SEND_COPY_REQUEST';
 
 export const SEND_GET_REQUEST = 'app/RequestPage/SEND_GET_REQUEST';
 export const SEND_GET_REQUEST_SUCCESS = 'app/RequestPage/SEND_GET_REQUEST_SUCCESS';
-export const SEND_GET_REQUEST_ERROR = 'app/RequestPage/SEND_GET_REQUEST_ERROR';
+
+export const SEND_DELETE_REQUEST = 'app/RequestPage/SEND_DELETE_REQUEST';
+export const SEND_DELETE_REQUEST_SUCCESS = 'app/RequestPage/SEND_DELETE_REQUEST_SUCCESS';
 
 export const REQUEST_METHOD_CHANGE = 'app/RequestPage/REQUEST_METHOD_CHANGE';
 export const REQUEST_URL_CHANGE = 'app/RequestPage/REQUEST_URL_CHANGE';
@@ -32,7 +38,7 @@ export const HEADER_VALUE_CHANGE = 'app/RequestPage/HEADER_VALUE_CHANGE';
 export const LOAD_AUTH_TOKEN = 'app/App/LOAD_AUTH_TOKEN';
 export const SET_AUTH_TOKEN = 'app/App/SET_AUTH_TOKEN';
 
-export const NEW_REQUEST = 'app/App/NEW_REQUEST';
+export const NEW_REQUEST_DIALOG = 'app/App/NEW_REQUEST_DIALOG';
 
 export function loadAuthToken() {
   return {
@@ -44,13 +50,6 @@ export function setAuthToken(authToken) {
   return {
     type: SET_AUTH_TOKEN,
     authToken,
-  };
-}
-
-export function requestCreateSuccess(request) {
-  return {
-    type: REQUEST_CREATE_SUCCESS,
-    request,
   };
 }
 
@@ -67,10 +66,17 @@ export function sendExecRequestSuccess(request) {
   };
 }
 
-export function sendExecRequestError(error) {
+export function sendCreateRequest(name) {
   return {
-    type: SEND_EXEC_REQUEST_ERROR,
-    error,
+    type: SEND_CREATE_REQUEST,
+    name,
+  };
+}
+
+export function sendCreateRequestSuccess(request) {
+  return {
+    type: SEND_CREATE_REQUEST_SUCCESS,
+    request,
   };
 }
 
@@ -93,9 +99,9 @@ export function sendGetRequestListSuccess(requestList) {
   };
 }
 
-export function sendGetRequestListError(error) {
+export function sendError(error) {
   return {
-    type: SEND_GET_REQUEST_LIST_ERROR,
+    type: SEND_ERROR,
     error,
   };
 }
@@ -111,13 +117,6 @@ export function sendGetRequestSuccess(request) {
   return {
     type: SEND_GET_REQUEST_SUCCESS,
     request,
-  };
-}
-
-export function sendGetRequestError(error) {
-  return {
-    type: SEND_GET_REQUEST_ERROR,
-    error,
   };
 }
 
@@ -177,9 +176,47 @@ export function headerValueChange(index, value) {
   };
 }
 
-export function openNewRequest() {
+export function sendDeleteRequest(requestId) {
   return {
-    type: NEW_REQUEST,
+    type: SEND_DELETE_REQUEST,
+    requestId,
+  };
+}
+
+export function sendDeleteRequestSuccess(requestId) {
+  return {
+    type: SEND_DELETE_REQUEST_SUCCESS,
+    requestId,
+  };
+}
+
+export function sendEditRequest(name) {
+  return {
+    type: SEND_EDIT_REQUEST,
+    name,
+  };
+}
+
+export function sendEditRequestSuccess(request) {
+  return {
+    type: SEND_EDIT_REQUEST_SUCCESS,
+    request,
+  };
+}
+
+export function openNewRequestDialog(name) {
+  return {
+    type: NEW_REQUEST_DIALOG,
+    open: true,
+    name,
+  };
+}
+
+
+export function closeNewRequestDialog() {
+  return {
+    type: NEW_REQUEST_DIALOG,
+    open: false,
   };
 }
 
