@@ -10,6 +10,8 @@ import jwtDecode from 'jwt-decode';
 import {
   ADD_HEADER,
   DELETE_HEADER,
+  HEADER_NAME_CHANGE,
+  HEADER_VALUE_CHANGE,
   NEW_REQUEST,
   REQUEST_BODY_CHANGE,
   REQUEST_CREATE_SUCCESS,
@@ -123,6 +125,12 @@ function requestPageReducer(state = initialState, action) {
           name: '',
           value: '',
         })));
+    case HEADER_NAME_CHANGE:
+      return state
+        .setIn(['request', 'data', 'headers', action.index, 'name'], action.value);
+    case HEADER_VALUE_CHANGE:
+      return state
+        .setIn(['request', 'data', 'headers', action.index, 'value'], action.value);
 
     case NEW_REQUEST:
       return state
