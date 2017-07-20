@@ -18,6 +18,7 @@ import prettyMs from 'pretty-ms';
 import { push } from 'react-router-redux';
 // import NavigationClose from 'material-ui/svg-icons/navigation/close';
 import ActionAutorenew from 'material-ui/svg-icons/action/autorenew';
+import RemoveIcon from 'material-ui/svg-icons/action/delete';
 import { FormattedMessage } from 'react-intl';
 import { createStructuredSelector } from 'reselect';
 import makeSelectRequestPage, {
@@ -34,7 +35,9 @@ import MethodField from './MethodField';
 import URLField from './URLField';
 import SendButton from './SendButton';
 import {
+  addHeader,
   cancelExecRequest,
+  deleteHeader,
   loadAuthToken,
   openNewRequest,
   requestBodyChange,
@@ -189,6 +192,7 @@ export class RequestPage extends React.Component { // eslint-disable-line react/
                   floatingLabelText="Value"
                   value={h.get('value')}
                 />
+                <IconButton onClick={() => this.props.deleteHeader(i)}><RemoveIcon /></IconButton>
               </div>,
             )}
           </ul>
@@ -220,6 +224,8 @@ RequestPage.propTypes = {
   initAuthToken: PropTypes.func.isRequired,
   sendCopyRequest: PropTypes.func.isRequired,
   openNewRequest: PropTypes.func.isRequired,
+  addHeader: PropTypes.func.isRequired,
+  deleteHeader: PropTypes.func.isRequired,
   sendExecRequestSuccess: PropTypes.func.isRequired,
   request: PropTypes.object.isRequired,
   requestList: PropTypes.object.isRequired,
@@ -261,6 +267,8 @@ function mapDispatchToProps(dispatch) {
     },
     sendGetRequest: (req) => dispatch(sendGetRequest(req)),
     sendCopyRequest: () => dispatch(sendCopyRequest()),
+    addHeader: () => dispatch(addHeader()),
+    deleteHeader: (i) => dispatch(deleteHeader(i)),
     openNewRequest: () => {
       dispatch(openNewRequest());
       dispatch(push('/request'));

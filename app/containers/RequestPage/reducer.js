@@ -8,6 +8,7 @@ import { fromJS } from 'immutable';
 import jwtDecode from 'jwt-decode';
 
 import {
+  DELETE_HEADER,
   NEW_REQUEST,
   REQUEST_BODY_CHANGE,
   REQUEST_CREATE_SUCCESS,
@@ -112,6 +113,9 @@ function requestPageReducer(state = initialState, action) {
     case REQUEST_BODY_CHANGE:
       return state
         .setIn(['request', 'data', 'body'], action.body);
+    case DELETE_HEADER:
+      return state
+        .setIn(['request', 'data', 'headers'], state.getIn(['request', 'data', 'headers']).delete(action.index));
 
     case NEW_REQUEST:
       return state
