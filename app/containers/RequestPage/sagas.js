@@ -11,16 +11,14 @@ import {
   SEND_COPY_REQUEST,
   SEND_CREATE_REQUEST,
   SEND_DELETE_REQUEST,
+  SEND_EDIT_REQUEST,
   SEND_EXEC_REQUEST,
   SEND_GET_REQUEST,
   SEND_GET_REQUEST_LIST,
   sendCreateRequestSuccess,
-  sendDeleteRequestError,
   sendDeleteRequestSuccess,
-  sendExecRequestError,
+  sendError,
   sendExecRequestSuccess,
-  sendGetRequestError,
-  sendGetRequestListError,
   sendGetRequestListSuccess,
   sendGetRequestSuccess,
   setAuthToken,
@@ -50,7 +48,7 @@ function* sendCreateRequest(action) {
     yield put(sendCreateRequestSuccess(fromJS(req)));
     yield put(push(`/request/${req.id}`));
   } catch (err) {
-    yield put(sendExecRequestError(err));
+    yield put(sendError(err));
   }
 }
 
@@ -74,7 +72,7 @@ export function* sendExecRequest() {
     yield call(request, requestURL, options);
     yield call(tryLoadResponseUntilDone);
   } catch (err) {
-    yield put(sendExecRequestError(err));
+    yield put(sendError(err));
   }
 }
 
@@ -106,14 +104,14 @@ function* loadRequestUntilDone() {
       try {
         loadedReq = yield call(request, requestURL, options);
       } catch (err) {
-        yield put(sendExecRequestError(err));
+        yield put(sendError(err));
         break;
       }
 
       if (loadedReq.status.status === 'in_progress') {
         yield call(delay, 1000);
       } else if (loadedReq.status.status === 'error') {
-        yield put(sendExecRequestError('error from server'));
+        yield put(sendError('error from server'));
         return;
       } else {
         yield put(sendExecRequestSuccess(fromJS(loadedReq)));
@@ -121,10 +119,10 @@ function* loadRequestUntilDone() {
         return;
       }
     }
-    yield put(sendExecRequestError('Waiting response timeout'));
+    yield put(sendError('Waiting response timeout'));
   } finally {
     if (yield cancelled()) {
-      yield put(sendExecRequestError('Task cancelled'));
+      yield put(sendError('Task cancelled'));
     }
   }
 }
@@ -149,7 +147,7 @@ export function* sendRequestList() {
     const requestList = fromJS(json);
     yield put(sendGetRequestListSuccess(requestList));
   } catch (err) {
-    yield put(sendGetRequestListError(err));
+    yield put(sendError(err));
   }
 }
 
@@ -173,7 +171,7 @@ export function* sendGetRequest(action) {
     const requestJson = fromJS(json);
     yield put(sendGetRequestSuccess(requestJson));
   } catch (err) {
-    yield put(sendGetRequestError(err));
+    yield put(sendError(err));
   }
 }
 
@@ -197,7 +195,7 @@ export function* sendDeleteRequest(action) {
     yield put(push('/request'));
     yield put(sendDeleteRequestSuccess(action.requestId));
   } catch (err) {
-    yield put(sendDeleteRequestError(err));
+    yield put(sendError(err));
   }
 }
 
@@ -224,7 +222,34 @@ export function* sendCopyRequest() {
     yield put(sendExecRequestSuccess(requestJson));
     yield put(push(`/request/${requestJson.get('id')}`));
   } catch (err) {
-    yield put(sendExecRequestError(err));
+    yield put(sendError(err));
+  }
+}
+
+export function* sendEditRequest(action) {
+  yield call(loadAuthToken);
+
+  const authToken = yield select(selectAuthToken());
+  const req = yield select(makeSelectRequest());
+
+  const requestURL = `/api/v1/requests/${req.get('id')}`;
+  const method = 'PATCH';
+  const options = {
+    method,
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${authToken}`,
+    },
+    body: JSON.stringify({ name: action.name }),
+  };
+
+  try {
+    const json = yield call(request, requestURL, options);
+    const requestJson = fromJS(json);
+    yield put(sendExecRequestSuccess(requestJson));
+  } catch (err) {
+    yield put(sendError(err.toString()));
   }
 }
 
@@ -291,6 +316,12 @@ export function* sendCopyRequestData() {
   yield cancel(watcher);
 }
 
+export function* sendEditRequestData() {
+  const watcher = yield takeLatest(SEND_EDIT_REQUEST, sendEditRequest);
+  yield take(LOCATION_CHANGE);
+  yield cancel(watcher);
+}
+
 export function* loadAuthTokenData() {
   const watcher = yield takeLatest(LOAD_AUTH_TOKEN, loadAuthToken);
   yield take(LOCATION_CHANGE);
@@ -306,4 +337,5 @@ export default [
   sendCopyRequestData,
   sendDeleteRequestData,
   sendCreateRequestData,
+  sendEditRequestData,
 ];

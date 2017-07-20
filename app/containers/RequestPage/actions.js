@@ -6,26 +6,26 @@
 
 export const SEND_EXEC_REQUEST = 'app/RequestPage/SEND_EXEC_REQUEST';
 export const SEND_EXEC_REQUEST_SUCCESS = 'app/RequestPage/SEND_EXEC_REQUEST_SUCCESS';
-export const SEND_EXEC_REQUEST_ERROR = 'app/RequestPage/SEND_EXEC_REQUEST_ERROR';
 
 export const SEND_CREATE_REQUEST = 'app/RequestPage/SEND_CREATE_REQUEST';
 export const SEND_CREATE_REQUEST_SUCCESS = 'app/RequestPage/SEND_CREATE_REQUEST_SUCCESS';
+
+export const SEND_EDIT_REQUEST = 'app/RequestPage/SEND_EDIT_REQUEST';
+export const SEND_EDIT_REQUEST_SUCCESS = 'app/RequestPage/SEND_EDIT_REQUEST_SUCCESS';
 
 export const CANCEL_EXEC_REQUEST = 'app/RequestPage/CANCEL_EXEC_REQUEST';
 
 export const SEND_GET_REQUEST_LIST = 'app/RequestPage/SEND_GET_REQUEST_LIST';
 export const SEND_GET_REQUEST_LIST_SUCCESS = 'app/RequestPage/SEND_GET_REQUEST_LIST_SUCCESS';
-export const SEND_GET_REQUEST_LIST_ERROR = 'app/RequestPage/SEND_GET_REQUEST_LIST_ERROR';
+export const SEND_ERROR = 'app/RequestPage/SEND_ERROR';
 
 export const SEND_COPY_REQUEST = 'app/RequestPage/SEND_COPY_REQUEST';
 
 export const SEND_GET_REQUEST = 'app/RequestPage/SEND_GET_REQUEST';
 export const SEND_GET_REQUEST_SUCCESS = 'app/RequestPage/SEND_GET_REQUEST_SUCCESS';
-export const SEND_GET_REQUEST_ERROR = 'app/RequestPage/SEND_GET_REQUEST_ERROR';
 
 export const SEND_DELETE_REQUEST = 'app/RequestPage/SEND_DELETE_REQUEST';
 export const SEND_DELETE_REQUEST_SUCCESS = 'app/RequestPage/SEND_DELETE_REQUEST_SUCCESS';
-export const SEND_DELETE_REQUEST_ERROR = 'app/RequestPage/SEND_DELETE_REQUEST_ERROR';
 
 export const REQUEST_METHOD_CHANGE = 'app/RequestPage/REQUEST_METHOD_CHANGE';
 export const REQUEST_URL_CHANGE = 'app/RequestPage/REQUEST_URL_CHANGE';
@@ -66,13 +66,6 @@ export function sendExecRequestSuccess(request) {
   };
 }
 
-export function sendExecRequestError(error) {
-  return {
-    type: SEND_EXEC_REQUEST_ERROR,
-    error,
-  };
-}
-
 export function sendCreateRequest(name) {
   return {
     type: SEND_CREATE_REQUEST,
@@ -106,9 +99,9 @@ export function sendGetRequestListSuccess(requestList) {
   };
 }
 
-export function sendGetRequestListError(error) {
+export function sendError(error) {
   return {
-    type: SEND_GET_REQUEST_LIST_ERROR,
+    type: SEND_ERROR,
     error,
   };
 }
@@ -124,13 +117,6 @@ export function sendGetRequestSuccess(request) {
   return {
     type: SEND_GET_REQUEST_SUCCESS,
     request,
-  };
-}
-
-export function sendGetRequestError(error) {
-  return {
-    type: SEND_GET_REQUEST_ERROR,
-    error,
   };
 }
 
@@ -204,17 +190,25 @@ export function sendDeleteRequestSuccess(requestId) {
   };
 }
 
-export function sendDeleteRequestError(error) {
+export function sendEditRequest(name) {
   return {
-    type: SEND_DELETE_REQUEST_ERROR,
-    error,
+    type: SEND_EDIT_REQUEST,
+    name,
   };
 }
 
-export function openNewRequestDialog() {
+export function sendEditRequestSuccess(request) {
+  return {
+    type: SEND_EDIT_REQUEST_SUCCESS,
+    request,
+  };
+}
+
+export function openNewRequestDialog(name) {
   return {
     type: NEW_REQUEST_DIALOG,
     open: true,
+    name,
   };
 }
 

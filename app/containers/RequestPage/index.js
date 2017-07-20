@@ -28,8 +28,9 @@ import { createStructuredSelector } from 'reselect';
 import makeSelectRequestPage, {
   makeSelectRequest,
   selectErrorExecRequest,
-  selectErrorRequestList,
+  selectErrorSend,
   selectLoadingExecRequest,
+  selectNewRequestDialogName,
   selectNewRequestDialogOpen,
   selectRequestList,
   selectUser,
@@ -55,6 +56,7 @@ import {
   sendCopyRequest,
   sendCreateRequest,
   sendDeleteRequest,
+  sendEditRequest,
   sendExecRequest,
   sendExecRequestSuccess,
   sendGetRequest,
@@ -126,22 +128,18 @@ export class RequestPage extends React.Component { // eslint-disable-line react/
       );
     }
 
-    let errorRender = null;
-    if (this.props.errorExecRequest) {
-      errorRender = (
-        <div>
-          Error: {this.props.errorExecRequest}
-        </div>
-      );
-    }
-
     let formRender = null;
     if (renderRequestForm) {
       formRender = (
         <form onSubmit={this.props.onSubmitForm}>
           <SendButton
             label="DELETE"
-            onClick={() => this.props.sendDeleteRequest(request.get('id'))}
+            onTouchTap={() => this.props.sendDeleteRequest(request.get('id'))}
+            disabled={editDisabled || !request.get('id')}
+          />
+          <SendButton
+            label="EDIT"
+            onTouchTap={() => this.props.openNewRequestDialog(request.get('name'))}
             disabled={editDisabled || !request.get('id')}
           />
 
@@ -192,13 +190,12 @@ export class RequestPage extends React.Component { // eslint-disable-line react/
           <TextField
             hintText="Body"
             floatingLabelText="Body"
-            onChange={(evt) => this.props.onChangeBody(evt.target.value)}
+            onChange={(evt) => this.props.onChangeBody(evt.target.value)} d
             multiLine
             rows={2}
             fullWidth
           />
 
-          {errorRender}
           {responseRender}
         </form>
       );
@@ -213,7 +210,7 @@ export class RequestPage extends React.Component { // eslint-disable-line react/
       <FlatButton
         label="Submit"
         primary
-        onTouchTap={() => this.props.sendCreateRequest(this.newRequestName.getValue())}
+        onTouchTap={() => this.props.onSubmitDialog(this.newRequestName.getValue(), this.props.newRequestDialogName === '')}
       />,
     ];
 
@@ -246,7 +243,7 @@ export class RequestPage extends React.Component { // eslint-disable-line react/
         <PaddedContainer>
           <SendButton
             label={<FormattedMessage {...messages.newRequest} />}
-            onTouchTap={this.props.openNewRequestDialog}
+            onTouchTap={() => this.props.openNewRequestDialog()}
           />
 
           {formRender}
@@ -263,14 +260,15 @@ export class RequestPage extends React.Component { // eslint-disable-line react/
           <TextField
             hintText="Name"
             floatingLabelText="Name"
+            defaultValue={this.props.newRequestDialogName}
             // eslint-disable-next-line no-return-assign
             ref={(input) => this.newRequestName = input}
           />
         </Dialog>
 
         <Snackbar
-          open={this.props.errorRequestList !== false}
-          message={this.props.errorRequestList}
+          open={this.props.errorSend !== false}
+          message={this.props.errorSend}
         />
       </div>
     );
@@ -293,17 +291,14 @@ RequestPage.propTypes = {
   openNewRequestDialog: PropTypes.func.isRequired,
   closeNewRequestDialog: PropTypes.func.isRequired,
   newRequestDialogOpen: PropTypes.bool.isRequired,
-  sendCreateRequest: PropTypes.func.isRequired,
   addHeader: PropTypes.func.isRequired,
   deleteHeader: PropTypes.func.isRequired,
+  onSubmitDialog: PropTypes.func.isRequired,
+  newRequestDialogName: PropTypes.string.isRequired,
   sendExecRequestSuccess: PropTypes.func.isRequired,
   request: PropTypes.object.isRequired,
   requestList: PropTypes.object.isRequired,
-  errorExecRequest: React.PropTypes.oneOfType([
-    React.PropTypes.string,
-    React.PropTypes.bool,
-  ]),
-  errorRequestList: React.PropTypes.oneOfType([
+  errorSend: React.PropTypes.oneOfType([
     React.PropTypes.string,
     React.PropTypes.bool,
   ]),
@@ -317,12 +312,12 @@ RequestPage.propTypes = {
 const mapStateToProps = createStructuredSelector({
   RequestPage: makeSelectRequestPage(),
   request: makeSelectRequest(),
-  errorExecRequest: selectErrorExecRequest(),
   loadingExecRequest: selectLoadingExecRequest(),
   requestList: selectRequestList(),
   user: selectUser(),
-  errorRequestList: selectErrorRequestList(),
+  errorSend: selectErrorSend(),
   newRequestDialogOpen: selectNewRequestDialogOpen(),
+  newRequestDialogName: selectNewRequestDialogName(),
 });
 
 function mapDispatchToProps(dispatch) {
@@ -338,7 +333,6 @@ function mapDispatchToProps(dispatch) {
     },
     sendRequestList: (requestId) => dispatch(sendGetRequestList(requestId)),
     sendDeleteRequest: (requestId) => dispatch(sendDeleteRequest(requestId)),
-    sendCreateRequest: (name) => dispatch(sendCreateRequest(name)),
     cancelExecRequest: () => dispatch(cancelExecRequest()),
     initAuthToken: () => dispatch(loadAuthToken()),
     sendExecRequestSuccess: (req) => {
@@ -349,8 +343,15 @@ function mapDispatchToProps(dispatch) {
     sendCopyRequest: () => dispatch(sendCopyRequest()),
     addHeader: () => dispatch(addHeader()),
     deleteHeader: (i) => dispatch(deleteHeader(i)),
-    openNewRequestDialog: () => dispatch(openNewRequestDialog()),
+    openNewRequestDialog: (name) => dispatch(openNewRequestDialog(name)),
     closeNewRequestDialog: () => dispatch(closeNewRequestDialog()),
+    onSubmitDialog: (name, create) => {
+      if (create) {
+        dispatch(sendCreateRequest(name));
+      } else {
+        dispatch(sendEditRequest(name));
+      }
+    },
   };
 }
 
