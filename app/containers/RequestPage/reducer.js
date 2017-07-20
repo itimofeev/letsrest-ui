@@ -17,6 +17,8 @@ import {
   REQUEST_CREATE_SUCCESS,
   REQUEST_METHOD_CHANGE,
   REQUEST_URL_CHANGE,
+  SEND_DELETE_REQUEST,
+  SEND_DELETE_REQUEST_ERROR,
   SEND_DELETE_REQUEST_SUCCESS,
   SEND_EXEC_REQUEST,
   SEND_EXEC_REQUEST_ERROR,
@@ -105,8 +107,14 @@ function requestPageReducer(state = initialState, action) {
         .set('requestList', action.requestList)
         .set('loadingRequestList', false);
 
+    case SEND_DELETE_REQUEST:
+      return state
+        .set('errorRequestList', false);
     case SEND_DELETE_REQUEST_SUCCESS:
       return deleteRequest(state, action.requestId);
+    case SEND_DELETE_REQUEST_ERROR:
+      return deleteRequest(state, action.requestId)
+        .set('errorRequestList', action.error);
 
     case REQUEST_METHOD_CHANGE:
       return state

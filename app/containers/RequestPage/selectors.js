@@ -29,6 +29,11 @@ const selectRequestList = () => createSelector(
   (requestPageState) => requestPageState.get('requestList')
 );
 
+const selectErrorRequestList = () => createSelector(
+  selectRequestPageDomain(),
+  (requestPageState) => requestPageState.get('errorRequestList'),
+);
+
 const selectUser = () => createSelector(
   selectRequestPageDomain(),
   (requestPageState) => requestPageState.get('user')
@@ -57,4 +62,5 @@ export {
   selectRequestList,
   selectAuthToken,
   selectUser,
+  selectErrorRequestList,
 };

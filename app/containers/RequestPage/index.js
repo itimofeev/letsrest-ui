@@ -13,6 +13,7 @@ import AppBar from 'material-ui/AppBar';
 import Drawer from 'material-ui/Drawer';
 import TextField from 'material-ui/TextField';
 import IconButton from 'material-ui/IconButton';
+import Snackbar from 'material-ui/Snackbar';
 import prettyByte from 'pretty-byte';
 import prettyMs from 'pretty-ms';
 import { push } from 'react-router-redux';
@@ -25,6 +26,7 @@ import { createStructuredSelector } from 'reselect';
 import makeSelectRequestPage, {
   makeSelectRequest,
   selectErrorExecRequest,
+  selectErrorRequestList,
   selectLoadingExecRequest,
   selectRequestList,
   selectUser,
@@ -220,6 +222,10 @@ export class RequestPage extends React.Component { // eslint-disable-line react/
           {errorRender}
           {responseRender}
         </Form>
+        <Snackbar
+          open={this.props.errorRequestList !== false}
+          message={this.props.errorRequestList}
+        />
       </div>
     );
   }
@@ -248,6 +254,10 @@ RequestPage.propTypes = {
     React.PropTypes.string,
     React.PropTypes.bool,
   ]),
+  errorRequestList: React.PropTypes.oneOfType([
+    React.PropTypes.string,
+    React.PropTypes.bool,
+  ]),
   user: React.PropTypes.oneOfType([
     React.PropTypes.object,
     React.PropTypes.bool,
@@ -262,11 +272,12 @@ const mapStateToProps = createStructuredSelector({
   loadingExecRequest: selectLoadingExecRequest(),
   requestList: selectRequestList(),
   user: selectUser(),
+  errorRequestList: selectErrorRequestList(),
 });
 
 function mapDispatchToProps(dispatch) {
   return {
-    onChangeMethod: (event, index, method) => dispatch(requestMethodChange(method)),
+    onChangeMethod: (value) => dispatch(requestMethodChange(value)),
     onChangeUrl: (value) => dispatch(requestUrlChange(value)),
     onChangeBody: (value) => dispatch(requestBodyChange(value)),
     onHeaderNameChange: (i, value) => dispatch(headerNameChange(i, value)),
