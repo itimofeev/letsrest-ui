@@ -2,24 +2,27 @@ import { fromJS } from 'immutable';
 import Logger from 'js-logger';
 import { LOCATION_CHANGE, push } from 'react-router-redux';
 import { delay } from 'redux-saga';
-import { cancel, cancelled, fork, put, call, take, select, takeLatest } from 'redux-saga/effects';
+import { call, cancel, cancelled, fork, put, select, take, takeLatest } from 'redux-saga/effects';
 import request from 'utils/request';
 import { getAuthTokenOrNull, storeAuthToken } from '../../utils/localStorageHelper';
 import {
-  SEND_EXEC_REQUEST,
-  SEND_GET_REQUEST_LIST,
   CANCEL_EXEC_REQUEST,
   LOAD_AUTH_TOKEN,
-  SEND_GET_REQUEST,
-  SEND_COPY_REQUEST,
-  setAuthToken,
-  sendExecRequestSuccess,
-  sendExecRequestError,
-  sendGetRequestListSuccess,
-  sendGetRequestListError,
   requestCreateSuccess,
-  sendGetRequestSuccess,
+  SEND_COPY_REQUEST,
+  SEND_DELETE_REQUEST,
+  SEND_EXEC_REQUEST,
+  SEND_GET_REQUEST,
+  SEND_GET_REQUEST_LIST,
+  sendDeleteRequestError,
+  sendDeleteRequestSuccess,
+  sendExecRequestError,
+  sendExecRequestSuccess,
   sendGetRequestError,
+  sendGetRequestListError,
+  sendGetRequestListSuccess,
+  sendGetRequestSuccess,
+  setAuthToken,
 } from './actions';
 import { makeSelectRequest, selectAuthToken } from './selectors';
 
@@ -181,6 +184,30 @@ export function* sendGetRequest(action) {
   }
 }
 
+export function* sendDeleteRequest(action) {
+  yield call(loadAuthToken);
+
+  const authToken = yield select(selectAuthToken());
+  const requestURL = `/api/v1/requests/${action.requestId}`;
+  const method = 'DELETE';
+  const options = {
+    method,
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${authToken}`,
+    },
+  };
+
+  try {
+    yield call(request, requestURL, options);
+    yield put(push('/request'));
+    yield put(sendDeleteRequestSuccess(action.requestId));
+  } catch (err) {
+    yield put(sendDeleteRequestError(err));
+  }
+}
+
 export function* sendCopyRequest() {
   yield call(loadAuthToken);
 
@@ -252,6 +279,12 @@ export function* sendGetRequestData() {
   yield cancel(watcher);
 }
 
+export function* sendDeleteRequestData() {
+  const watcher = yield takeLatest(SEND_DELETE_REQUEST, sendDeleteRequest);
+  yield take(LOCATION_CHANGE);
+  yield cancel(watcher);
+}
+
 export function* sendCopyRequestData() {
   const watcher = yield takeLatest(SEND_COPY_REQUEST, sendCopyRequest);
   yield take(LOCATION_CHANGE);
@@ -271,4 +304,5 @@ export default [
   sendGetRequestData,
   loadAuthTokenData,
   sendCopyRequestData,
+  sendDeleteRequestData,
 ];

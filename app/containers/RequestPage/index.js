@@ -47,6 +47,7 @@ import {
   requestMethodChange,
   requestUrlChange,
   sendCopyRequest,
+  sendDeleteRequest,
   sendExecRequest,
   sendExecRequestSuccess,
   sendGetRequest,
@@ -157,6 +158,11 @@ export class RequestPage extends React.Component { // eslint-disable-line react/
             label={<FormattedMessage {...messages.newRequest} />}
             onClick={this.props.openNewRequest}
           />
+          <SendButton
+            label="DELETE"
+            onClick={() => this.props.sendDeleteRequest(request.get('id'))}
+            disabled={editDisabled || !request.get('id')}
+          />
 
           <RequestContainer>
             <MethodField
@@ -228,6 +234,7 @@ RequestPage.propTypes = {
   onSubmitForm: PropTypes.func.isRequired,
   cancelExecRequest: PropTypes.func.isRequired,
   sendRequestList: PropTypes.func.isRequired,
+  sendDeleteRequest: PropTypes.func.isRequired,
   sendGetRequest: PropTypes.func.isRequired,
   initAuthToken: PropTypes.func.isRequired,
   sendCopyRequest: PropTypes.func.isRequired,
@@ -269,6 +276,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(sendExecRequest());
     },
     sendRequestList: (requestId) => dispatch(sendGetRequestList(requestId)),
+    sendDeleteRequest: (requestId) => dispatch(sendDeleteRequest(requestId)),
     cancelExecRequest: () => dispatch(cancelExecRequest()),
     initAuthToken: () => dispatch(loadAuthToken()),
     sendExecRequestSuccess: (req) => {

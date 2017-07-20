@@ -17,6 +17,7 @@ import {
   REQUEST_CREATE_SUCCESS,
   REQUEST_METHOD_CHANGE,
   REQUEST_URL_CHANGE,
+  SEND_DELETE_REQUEST_SUCCESS,
   SEND_EXEC_REQUEST,
   SEND_EXEC_REQUEST_ERROR,
   SEND_EXEC_REQUEST_SUCCESS,
@@ -104,6 +105,9 @@ function requestPageReducer(state = initialState, action) {
         .set('requestList', action.requestList)
         .set('loadingRequestList', false);
 
+    case SEND_DELETE_REQUEST_SUCCESS:
+      return deleteRequest(state, action.requestId);
+
     case REQUEST_METHOD_CHANGE:
       return state
         .setIn(['request', 'data', 'method'], action.method);
@@ -150,6 +154,15 @@ function setRequest(state, request) {
     return newState.update('requestList', (requestList) => requestList.push(request));
   }
   return newState.setIn(['requestList', requestIndex], request);
+}
+
+function deleteRequest(state, id) {
+  const requestIndex = state.get('requestList').findIndex((item) => item.get('id') === id);
+  if (requestIndex === -1) {
+    return state;
+  }
+
+  return state.deleteIn(['requestList', requestIndex]).set('request', initialRequest);
 }
 
 export default requestPageReducer;

@@ -21,6 +21,10 @@ export const SEND_GET_REQUEST = 'app/RequestPage/SEND_GET_REQUEST';
 export const SEND_GET_REQUEST_SUCCESS = 'app/RequestPage/SEND_GET_REQUEST_SUCCESS';
 export const SEND_GET_REQUEST_ERROR = 'app/RequestPage/SEND_GET_REQUEST_ERROR';
 
+export const SEND_DELETE_REQUEST = 'app/RequestPage/SEND_DELETE_REQUEST';
+export const SEND_DELETE_REQUEST_SUCCESS = 'app/RequestPage/SEND_DELETE_REQUEST_SUCCESS';
+export const SEND_DELETE_REQUEST_ERROR = 'app/RequestPage/SEND_DELETE_REQUEST_ERROR';
+
 export const REQUEST_METHOD_CHANGE = 'app/RequestPage/REQUEST_METHOD_CHANGE';
 export const REQUEST_URL_CHANGE = 'app/RequestPage/REQUEST_URL_CHANGE';
 export const REQUEST_BODY_CHANGE = 'app/RequestPage/REQUEST_BODY_CHANGE';
@@ -174,6 +178,27 @@ export function headerValueChange(index, value) {
     type: HEADER_VALUE_CHANGE,
     index,
     value,
+  };
+}
+
+export function sendDeleteRequest(requestId) {
+  return {
+    type: SEND_DELETE_REQUEST,
+    requestId,
+  };
+}
+
+export function sendDeleteRequestSuccess(requestId) {
+  return {
+    type: SEND_DELETE_REQUEST_SUCCESS,
+    requestId,
+  };
+}
+
+export function sendDeleteRequestError(error) {
+  return {
+    type: SEND_DELETE_REQUEST_ERROR,
+    error,
   };
 }
 
