@@ -19,6 +19,7 @@ import { push } from 'react-router-redux';
 // import NavigationClose from 'material-ui/svg-icons/navigation/close';
 import ActionAutorenew from 'material-ui/svg-icons/action/autorenew';
 import RemoveIcon from 'material-ui/svg-icons/action/delete';
+import AddIcon from 'material-ui/svg-icons/content/add';
 import { FormattedMessage } from 'react-intl';
 import { createStructuredSelector } from 'reselect';
 import makeSelectRequestPage, {
@@ -196,6 +197,7 @@ export class RequestPage extends React.Component { // eslint-disable-line react/
               </div>,
             )}
           </ul>
+          <IconButton onClick={this.props.addHeader}><AddIcon /></IconButton>
           <TextField
             hintText="Body"
             floatingLabelText="Body"

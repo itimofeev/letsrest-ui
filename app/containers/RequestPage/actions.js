@@ -154,7 +154,7 @@ export function deleteHeader(index) {
 
 export function addHeader() {
   return {
-    type: DELETE_HEADER,
+    type: ADD_HEADER,
   };
 }
 
