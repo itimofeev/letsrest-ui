@@ -243,7 +243,7 @@ export class RequestPage extends React.Component { // eslint-disable-line react/
         <PaddedContainer>
           <SendButton
             label={<FormattedMessage {...messages.newRequest} />}
-            onTouchTap={() => this.props.openNewRequestDialog()}
+            onTouchTap={() => this.props.openNewRequestDialog('')}
           />
 
           {formRender}
